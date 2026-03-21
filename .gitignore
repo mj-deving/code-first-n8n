@@ -1,0 +1,15 @@
+# Cloned repos (have their own git repos at ~/projects/)
+n8n-nodes-utcp-codemode/
+n8n-autopilot/
+repo/
+
+# Build artifacts
+node_modules/
+dist/
+*.tgz
+
+# PRD work directories (transient)
+MEMORY/WORK/
+
+# Plans (transient)
+Plans/
