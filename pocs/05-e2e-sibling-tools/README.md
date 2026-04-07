@@ -43,18 +43,18 @@ n8n AI Agent
 |---|---|---|
 | WF11 — E2E Sibling Tools | pxCt6Wv92qqUbznT | Calculator Tool → Code-Mode Tool → AI Agent |
 
-### Results (7/8 criteria pass — 1 bug found)
+### Results (8/8 criteria pass — ALL GREEN)
 
 | Criterion | Status | Notes |
 |---|---|---|
 | Calculator sibling detected | **Pass** | Auto-discovered via getInputConnectionData |
 | Tool schema converted | **Pass** | LangChain → ToolLike conversion works |
-| Sandbox sees sibling tools | **Pass** | Tool description includes Calculator |
-| LLM writes code using sibling | **Pass** | Claude writes TypeScript calling `Calculator_Tool()` (exec 82) |
-| Sandbox calls sibling | **Pass** | Tool IS called — 4 attempts in exec 82 |
-| Result flows back | **BUG** | Response returns `[object Object]` — serialization failure |
-| Error handling | **Pass** | LLM gracefully falls back to direct computation |
-| Full E2E round-trip | **Partial** | Correct answer (4306), but via fallback, not sibling result |
+| Sandbox sees sibling tools | **Pass** | Tool description includes Calculator with call syntax |
+| LLM writes code using sibling | **Pass** | Claude writes TypeScript calling `sibling.calculator()` |
+| Sandbox calls sibling | **Pass** | Tool called through bridge, result flows back |
+| Result flows back | **Pass** | Returns `{sum: 300}` correctly (exec 92) |
+| Error handling | **Pass** | Invalid tool calls handled gracefully |
+| Full E2E round-trip | **Pass** | 100+200=300 via sibling tool, multi-step 17+25=42→42*3=126 |
 
 ### E2E Test Results (2026-04-07)
 
@@ -80,7 +80,7 @@ Output: "The final result is 4306" (correct: 47×89=4183, 4183+123=4306)
 1. ~~**Gemini 2.0 Flash** sends empty args~~ → Swapped to Claude via OpenRouter ✅
 2. ~~**OpenRouter credits depleted**~~ → Credits topped up ✅
 3. ~~**Serialization bug**~~ → Fixed: `tool.invoke(JSON.stringify(args))` instead of `tool.invoke(args)`. n8n toolCode does `JSON.parse(query)` internally — passing object caused `[object Object]`. Commit `8006b21` in monorepo. ✅
-4. **Remaining: LLM prompt refinement** — Claude sees the sibling tool schema but prefers direct computation over calling it. Need to refine the tool description or system prompt to encourage sibling tool usage. Not a code bug — a prompt engineering task.
+4. ~~**LLM prompt refinement**~~ → Fixed: improved tool description with explicit `sibling.toolName()` syntax + IMPORTANT instruction. Claude now prefers sibling tools. ✅
 
 ## Test Coverage (Unit)
 
@@ -97,9 +97,10 @@ Output: "The final result is 4306" (correct: 47×89=4183, 4183+123=4306)
 - [x] WF11 created on n8n with Calculator sibling
 - [x] 7/8 E2E criteria pass (Claude via OpenRouter, exec 82)
 - [x] Full E2E round-trip attempted — correct answer but via fallback
-- [x] Fix args serialization bug (commit `8006b21` — JSON.stringify before invoke)
-- [x] Re-run E2E — serialization error gone (executions 87-88)
-- [ ] Refine LLM prompt to encourage sibling tool usage over direct computation
+- [x] Fix args serialization bug (commit `8006b21` → `420150a` — JSON round-trip for clean args)
+- [x] Fix tool description (commit `420150a` — explicit sibling call syntax + IMPORTANT instruction)
+- [x] Fix Calculator Tool code (handle both string and object `query` input)
+- [x] Full E2E verified: 100+200=300, multi-step 17+25=42→42*3=126 (exec 92-93)
 - [ ] `workflow.ts` — n8nac export of WF11
 - [ ] `test.ts` — automated E2E test
 

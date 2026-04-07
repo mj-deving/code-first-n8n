@@ -58,7 +58,7 @@ This repo is a **proving ground**. Each POC template in `pocs/` proves one layer
 | [02 — MCP Filesystem](pocs/02-mcp-filesystem/) | Runtime + MCP: real file ops in sandbox | Verified |
 | [03 — Multi-Agent Dispatch](pocs/03-multi-agent-dispatch/) | Architecture: 16 nodes → 1 code block | Analyzed |
 | 04 — Dev Loop | Full lifecycle: n8nac → code-mode end-to-end | Planned |
-| [05 — E2E Sibling Tools](pocs/05-e2e-sibling-tools/) | Auto-register: zero-config tool discovery | 7/8 pass (serialization bug) |
+| [05 — E2E Sibling Tools](pocs/05-e2e-sibling-tools/) | Auto-register: zero-config tool discovery | **8/8 pass** |
 
 ## Published Packages
 
