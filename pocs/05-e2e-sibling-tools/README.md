@@ -79,7 +79,8 @@ Output: "The final result is 4306" (correct: 47×89=4183, 4183+123=4306)
 
 1. ~~**Gemini 2.0 Flash** sends empty args~~ → Swapped to Claude via OpenRouter ✅
 2. ~~**OpenRouter credits depleted**~~ → Credits topped up ✅
-3. **NEW: Response serialization bug** — siblingAdapter returns need JSON.stringify before passing back to sandbox
+3. ~~**Serialization bug**~~ → Fixed: `tool.invoke(JSON.stringify(args))` instead of `tool.invoke(args)`. n8n toolCode does `JSON.parse(query)` internally — passing object caused `[object Object]`. Commit `8006b21` in monorepo. ✅
+4. **Remaining: LLM prompt refinement** — Claude sees the sibling tool schema but prefers direct computation over calling it. Need to refine the tool description or system prompt to encourage sibling tool usage. Not a code bug — a prompt engineering task.
 
 ## Test Coverage (Unit)
 
@@ -96,8 +97,9 @@ Output: "The final result is 4306" (correct: 47×89=4183, 4183+123=4306)
 - [x] WF11 created on n8n with Calculator sibling
 - [x] 7/8 E2E criteria pass (Claude via OpenRouter, exec 82)
 - [x] Full E2E round-trip attempted — correct answer but via fallback
-- [ ] Fix response serialization bug (siblingAdapter → sandbox bridge)
-- [ ] Re-run E2E after serialization fix → sibling result used directly
+- [x] Fix args serialization bug (commit `8006b21` — JSON.stringify before invoke)
+- [x] Re-run E2E — serialization error gone (executions 87-88)
+- [ ] Refine LLM prompt to encourage sibling tool usage over direct computation
 - [ ] `workflow.ts` — n8nac export of WF11
 - [ ] `test.ts` — automated E2E test
 
