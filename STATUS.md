@@ -14,7 +14,7 @@ See [THESIS.md](THESIS.md) — n8nac owns dev-time, code-mode owns runtime, toge
 |---|---|
 | **Thesis** | [THESIS.md](THESIS.md) — the lifecycle framing |
 | **Playbook** | [playbook/](playbook/) — portable knowledge (lifecycle, benchmarks, architecture) |
-| **POCs** | [pocs/](pocs/) — proven automation templates |
+| **POCs** | [workflows/](workflows/) — proven automation templates |
 | **npm (n8n)** | [n8n-nodes-utcp-codemode@2.1.0](https://www.npmjs.com/package/n8n-nodes-utcp-codemode) |
 | **npm (MCP)** | [code-mode-mcp-server@0.1.0](https://www.npmjs.com/package/code-mode-mcp-server) |
 | **GitHub (n8n)** | [mj-deving/n8n-nodes-utcp-codemode](https://github.com/mj-deving/n8n-nodes-utcp-codemode) |

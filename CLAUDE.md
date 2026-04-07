@@ -10,9 +10,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `THESIS.md` — **Front door: the n8nac + code-mode lifecycle thesis**
 - `playbook/` — **Portable knowledge** (lifecycle, benchmarks, architecture)
-- `pocs/` — **POC templates** — each proves a layer of the thesis
+- `workflows/` — **Workflow templates** — each proves a layer of the thesis
   - `01-customer-onboarding/` — Runtime: 96% token savings (benchmarked)
-  - `TEMPLATE.md` — What every POC must contain
+  - `02-mcp-filesystem/` — Runtime + MCP (verified live)
+  - `03-multi-agent-dispatch/` — Architecture (analyzed)
+  - `05-e2e-sibling-tools/` — Auto-register (8/8 pass)
+  - `TEMPLATE.md` — What every workflow directory must contain
+- `template/` — Scaffold template for new workflows
+- `scripts/` — Shared tooling (new-workflow.sh, check-secrets.sh)
+- `AGENTS.md` — AI agent guidelines for workflow development
 - `n8n-nodes-utcp-codemode/` — n8n community node (published, npm)
 - `code-mode-mcp-server/` — Standalone MCP server (published, npm)
 - `repo/` — Cloned upstream `universal-tool-calling-protocol/code-mode` (read-only)

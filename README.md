@@ -13,7 +13,7 @@ This repo proves that two tools together cover the entire n8n workflow lifecycle
 |---|---|---|
 | **Write workflows** | n8nac TypeScript (.workflow.ts) | Code-first today |
 | **Deploy workflows** | n8nac push CLI | Code-first today |
-| **Test workflows** | code-mode test harness | Proven ([POC-01](pocs/01-customer-onboarding/)) |
+| **Test workflows** | code-mode test harness | Proven ([POC-01](workflows/01-customer-onboarding/)) |
 | **Debug workflows** | code-mode trace + replay | Built into engine |
 | **Runtime execution** | code-mode sandbox | **96% token savings** ([benchmarks](playbook/benchmarks.md)) |
 | **Visual UI** | Verification only | Still there when you need it |
@@ -35,11 +35,11 @@ Each POC proves one layer of the thesis with real data:
 
 | POC | What It Proves | Status |
 |---|---|---|
-| [01 — Customer Onboarding](pocs/01-customer-onboarding/) | Runtime: 96% token savings | Benchmarked |
-| [02 — MCP Filesystem](pocs/02-mcp-filesystem/) | Real file operations through MCP in sandbox | Verified |
-| [03 — Multi-Agent Dispatch](pocs/03-multi-agent-dispatch/) | 16-node workflow → 1 code block | Analyzed |
+| [01 — Customer Onboarding](workflows/01-customer-onboarding/) | Runtime: 96% token savings | Benchmarked |
+| [02 — MCP Filesystem](workflows/02-mcp-filesystem/) | Real file operations through MCP in sandbox | Verified |
+| [03 — Multi-Agent Dispatch](workflows/03-multi-agent-dispatch/) | 16-node workflow → 1 code block | Analyzed |
 | 04 — Dev Loop | Full lifecycle: n8nac → code-mode end-to-end | Planned |
-| [05 — E2E Sibling Tools](pocs/05-e2e-sibling-tools/) | Zero-config tool discovery + execution | **8/8 pass** |
+| [05 — E2E Sibling Tools](workflows/05-e2e-sibling-tools/) | Zero-config tool discovery + execution | **8/8 pass** |
 
 ## Install
 
@@ -117,15 +117,26 @@ return { result: sum }; // { sum: 300 }
 
 Built on top of [@utcp/code-mode](https://www.npmjs.com/package/@utcp/code-mode) (upstream library by [UTCP](https://github.com/universal-tool-calling-protocol/code-mode)).
 
+## Create a New Workflow
+
+```bash
+./scripts/new-workflow.sh agents/06-slack-triage "Slack Message Triage"
+```
+
+This scaffolds a complete workflow directory from [template/](template/) with README, workflow.ts skeleton, test.json stub, and all sections pre-filled. See [TEMPLATE.md](TEMPLATE.md) for the hybrid approach.
+
+**Workflow lifecycle:** Develop in this monorepo → prove with benchmarks → graduate to standalone repo for distribution.
+
 ## Deep Dives
 
 | Document | What's Inside |
 |---|---|
 | [THESIS.md](THESIS.md) | The full thesis — why n8nac + code-mode cover the entire lifecycle |
+| [TEMPLATE.md](TEMPLATE.md) | Hybrid workflow template approach (develop → prove → graduate) |
 | [Playbook: Lifecycle](playbook/lifecycle.md) | Portable framing of the code-first n8n story |
 | [Playbook: Benchmarks](playbook/benchmarks.md) | Token savings data, methodology, cost projections |
 | [Playbook: Architecture](playbook/architecture.md) | How @code-mode/core, n8n node, and MCP server fit together |
-| [POC Template](pocs/TEMPLATE.md) | What every POC must contain to be reproducible |
+| [AGENTS.md](AGENTS.md) | AI agent guidelines for workflow development |
 
 ## LLM Compatibility
 
