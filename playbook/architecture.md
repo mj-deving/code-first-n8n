@@ -24,7 +24,7 @@ CodeModeUtcpClient                 CodeModeEngine                  n8n node
 @code-mode/core                  ← our production engine (caching, tracing, composition)
     ↓ consumed by
 n8n-nodes-utcp-codemode@2.1.0   ← n8n community node (thin wrapper)
-code-mode-mcp-server@0.1.0      ← MCP server (standalone, any MCP client)
+code-mode-tools@0.2.0      ← MCP server (standalone, any MCP client)
 ```
 
 ## @code-mode/core — The Engine
@@ -88,7 +88,7 @@ Exposes `execute_code_chain` and `list_available_tools` as MCP tools over stdio.
   "mcpServers": {
     "code-mode": {
       "command": "node",
-      "args": ["/path/to/code-mode-mcp-server/dist/index.js"],
+      "args": ["/path/to/code-mode-tools/dist/index.js"],
       "env": { "TOOLS_CONFIG": "/path/to/tools.json" }
     }
   }

@@ -52,14 +52,14 @@ Tool source configured in the Code-Mode Tool's `toolSources` parameter:
 
 ### MCP Server (standalone)
 
-The code-mode-mcp-server wraps this into a standalone MCP tool. Clients connect via stdio and call `execute_code_chain` with TypeScript that uses the registered filesystem tools.
+The code-mode-tools wraps this into a standalone MCP tool. Clients connect via stdio and call `execute_code_chain` with TypeScript that uses the registered filesystem tools.
 
 ```json
 {
   "mcpServers": {
     "code-mode": {
       "command": "node",
-      "args": ["code-mode-mcp-server/dist/index.js", "--config", "tools.json"]
+      "args": ["code-mode-tools/dist/index.js", "--config", "tools.json"]
     }
   }
 }

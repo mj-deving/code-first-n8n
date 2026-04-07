@@ -60,7 +60,7 @@ npm install n8n-nodes-utcp-codemode
 ### MCP Server (Claude Desktop, Cursor, any MCP client)
 
 ```bash
-npm install -g code-mode-mcp-server
+npm install -g code-mode-tools
 ```
 
 Add to your MCP config:
@@ -68,14 +68,14 @@ Add to your MCP config:
 {
   "mcpServers": {
     "code-mode": {
-      "command": "code-mode-mcp-server",
+      "command": "code-mode-tools",
       "args": ["--config", "tools.json"]
     }
   }
 }
 ```
 
-See [code-mode-mcp-server](https://github.com/mj-deving/code-mode-mcp-server) for full setup.
+See [code-mode-tools](https://github.com/mj-deving/code-mode-mcp-server) for full setup.
 
 ## How It Works
 
@@ -113,7 +113,7 @@ return { result: sum }; // { sum: 300 }
 | Package | Version | What |
 |---|---|---|
 | [n8n-nodes-utcp-codemode](https://www.npmjs.com/package/n8n-nodes-utcp-codemode) | 2.1.0 | n8n community node |
-| [code-mode-mcp-server](https://www.npmjs.com/package/code-mode-mcp-server) | 0.1.0 | Standalone MCP server |
+| [code-mode-tools](https://www.npmjs.com/package/code-mode-tools) | 0.2.0 | Standalone MCP server |
 
 Built on top of [@utcp/code-mode](https://www.npmjs.com/package/@utcp/code-mode) (upstream library by [UTCP](https://github.com/universal-tool-calling-protocol/code-mode)).
 

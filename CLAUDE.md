@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `template/` — Scaffold template for new workflows
 - `scripts/` — Shared tooling (new-workflow.sh, check-secrets.sh)
 - `n8n-nodes-utcp-codemode/` — n8n community node (published, npm)
-- `code-mode-mcp-server/` — Standalone MCP server (published, npm)
+- `code-mode-tools/` — Standalone MCP server (published, npm)
 - `repo/` — Cloned upstream `universal-tool-calling-protocol/code-mode` (read-only)
 - `n8n-autopilot/` — Cloned `mj-deving/n8n-autopilot` (read-only)
 - `archive/` — Original research artifacts from exploration phase

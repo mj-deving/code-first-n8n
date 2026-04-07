@@ -65,7 +65,7 @@ This repo is a **proving ground**. Each POC template in `workflows/` proves one 
 | Package | npm | What |
 |---|---|---|
 | `n8n-nodes-utcp-codemode` | [v2.1.0](https://www.npmjs.com/package/n8n-nodes-utcp-codemode) | n8n community node — Code-Mode Tool |
-| `code-mode-mcp-server` | [v0.1.0](https://www.npmjs.com/package/code-mode-mcp-server) | Standalone MCP server wrapping CodeModeEngine |
+| `code-mode-tools` | [v0.2.0](https://www.npmjs.com/package/code-mode-tools) | Standalone MCP server wrapping CodeModeEngine |
 | `@utcp/code-mode` | [v1.2.11](https://www.npmjs.com/package/@utcp/code-mode) | Upstream library (not ours) |
 
 ## Deep Dives

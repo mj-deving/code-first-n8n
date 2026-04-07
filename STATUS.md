@@ -16,9 +16,9 @@ See [THESIS.md](THESIS.md) — n8nac owns dev-time, code-mode owns runtime, toge
 | **Playbook** | [playbook/](playbook/) — portable knowledge (lifecycle, benchmarks, architecture) |
 | **POCs** | [workflows/](workflows/) — proven automation templates |
 | **npm (n8n)** | [n8n-nodes-utcp-codemode@2.1.0](https://www.npmjs.com/package/n8n-nodes-utcp-codemode) |
-| **npm (MCP)** | [code-mode-mcp-server@0.1.0](https://www.npmjs.com/package/code-mode-mcp-server) |
+| **npm (MCP)** | [code-mode-tools@0.2.0](https://www.npmjs.com/package/code-mode-tools) |
 | **GitHub (n8n)** | [mj-deving/n8n-nodes-utcp-codemode](https://github.com/mj-deving/n8n-nodes-utcp-codemode) |
-| **GitHub (MCP)** | [mj-deving/code-mode-mcp-server](https://github.com/mj-deving/code-mode-mcp-server) |
+| **GitHub (MCP)** | [mj-deving/code-mode-tools](https://github.com/mj-deving/code-mode-mcp-server) |
 | **Archive** | [archive/](archive/) — original research artifacts |
 
 ## Current Version: 2.1.0
@@ -151,7 +151,7 @@ See `strategic-initiatives-ideation.md` for full 34-idea analysis with intern cr
 3. ~~**npm publish v2.0** — publish both packages~~ ✅ done (v2.0.0)
 4. ~~**v2.1: Auto-register siblings** — detect sibling tool sub-nodes~~ ✅ done (v2.1.0)
 5. ~~**v3.0: MCP Server** — code-mode as an MCP server~~ ✅ built (v0.1.0, [repo](https://github.com/mj-deving/code-mode-mcp-server))
-5b. **npm publish MCP server** — `npm publish` code-mode-mcp-server@0.1.0 ← **NEXT**
+5b. **npm publish MCP server** — `npm publish` code-mode-tools@0.2.0 ← **NEXT**
 6. **Token Savings Calculator** — lead gen landing page (2-3 days)
 7. **Distribution** — dev.to / Reddit / LinkedIn
 8. **Revoke stale npm tokens** — two tokens shared in chat session

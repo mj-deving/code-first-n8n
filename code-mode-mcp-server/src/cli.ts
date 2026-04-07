@@ -19,13 +19,13 @@ export interface CliParsed {
   configArgs: string[];
 }
 
-const USAGE = `code-mode-mcp-server — Execute TypeScript code chains with pre-configured tools
+const USAGE = `code-mode-tools — Execute TypeScript code chains with pre-configured tools
 
 USAGE:
-  code-mode-mcp-server [--config <path>]                   MCP server mode (stdio)
-  code-mode-mcp-server exec [--config <path>] "<code>"     Execute code and print result
-  code-mode-mcp-server list-tools [--config <path>]        List available tools
-  code-mode-mcp-server --help                              Show this help
+  code-mode-tools [--config <path>]                   MCP server mode (stdio)
+  code-mode-tools exec [--config <path>] "<code>"     Execute code and print result
+  code-mode-tools list-tools [--config <path>]        List available tools
+  code-mode-tools --help                              Show this help
 
 OPTIONS:
   --config <path>       Path to tools.json config file (required)
@@ -35,13 +35,13 @@ OPTIONS:
 
 EXAMPLES:
   # MCP server mode (piped)
-  echo '{}' | code-mode-mcp-server --config tools.json
+  echo '{}' | code-mode-tools --config tools.json
 
   # Execute code
-  code-mode-mcp-server exec --config tools.json "const x = 1 + 1; return x;"
+  code-mode-tools exec --config tools.json "const x = 1 + 1; return x;"
 
   # List tools
-  code-mode-mcp-server list-tools --config tools.json
+  code-mode-tools list-tools --config tools.json
 `;
 
 /**
