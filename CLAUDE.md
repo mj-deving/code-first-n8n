@@ -88,11 +88,10 @@ Exported types: `CodeModeEngine`, `ExecutionOptions`, `ExecutionResult`, `ToolLi
   → sandbox calls both manual.mcp_tool() and sibling.toolName()
 ```
 
-Key files:
-- `packages/n8n/nodes/CodeModeTool/CodeModeTool.node.ts` — Thin wrapper (~420 lines)
+Key files (in monorepo at `~/projects/n8n-nodes-utcp-codemode/`):
+- `packages/n8n/nodes/CodeModeTool/CodeModeTool.node.ts` — Thin wrapper
 - `packages/n8n/nodes/CodeModeTool/siblingAdapter.ts` — LangChain → ToolLike adapter (v2.1)
 - `packages/n8n/nodes/CodeModeTool/presets.ts` — MCP preset configs
-- `packages/n8n/nodes/CodeModeTool/codemode.svg` — Node icon
 
 The node exposes six configurable parameters: `autoRegisterSiblings`, `mcpPresets`, `toolSources`, `timeout`, `memoryLimit`, `enableTrace`.
 
