@@ -76,6 +76,17 @@ The code-mode-mcp-server wraps this into a standalone MCP tool. Clients connect 
 | Gemini 2.0 Flash | Calls tools but returns **empty results** — known Gemini MCP weakness |
 | Latency | +10-50ms per tool call for bridge crossing (acceptable) |
 
+### Live Test (2026-04-07, execution verified)
+
+```
+Input:  "List files in allowed directory and read the first .json file"
+Output: Claude listed 2 files in C:\Users\User\mcp-test, read both:
+        - data.json: {"name":"Marius","project":"n8n-nodes-utcp-codemode","savings":"96%"}
+        - hello.txt: "Hello from MCP filesystem test!"
+```
+
+Claude wrote TypeScript that called `fs.filesystem_list_directory()` then `fs.filesystem_read_file()` for each file — all inside one sandbox execution, one LLM call.
+
 ## What This Demonstrates Beyond POC-01
 
 POC-01 proved token savings with simulated tools (code-as-tools). POC-02 proves:
