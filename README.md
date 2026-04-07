@@ -1,6 +1,6 @@
 # Code-First n8n
 
-**Cut AI Agent token costs by 96%. Make n8n fully code-first — from authoring through production.**
+**96% fewer tokens. 80% faster. 86% fewer nodes. Make n8n fully code-first -- from authoring through production.**
 
 This repo proves that two tools together cover the entire n8n workflow lifecycle without clicking:
 
@@ -13,12 +13,12 @@ This repo proves that two tools together cover the entire n8n workflow lifecycle
 |---|---|---|
 | **Write workflows** | n8nac TypeScript (.workflow.ts) | Code-first today |
 | **Deploy workflows** | n8nac push CLI | Code-first today |
-| **Test workflows** | code-mode test harness | Proven ([POC-01](workflows/01-customer-onboarding/)) |
+| **Test workflows** | code-mode test harness | Benchmarked ([POC-01](workflows/01-customer-onboarding/)) |
 | **Debug workflows** | code-mode trace + replay | Built into engine |
 | **Runtime execution** | code-mode sandbox | **96% token savings** ([benchmarks](playbook/benchmarks.md)) |
 | **Visual UI** | Verification only | Still there when you need it |
 
-## Proven Results
+## Benchmark Results
 
 5-tool customer onboarding pipeline — validate email → classify company → score tier → generate message → format report:
 
@@ -40,6 +40,22 @@ Each POC proves one layer of the thesis with real data:
 | [03 — Multi-Agent Dispatch](workflows/03-multi-agent-dispatch/) | 16-node workflow → 1 code block | Analyzed |
 | [04 — Dev Loop](workflows/agents/04-dev-loop/) | Full lifecycle: n8nac → code-mode end-to-end | Designed |
 | [05 — E2E Sibling Tools](workflows/05-e2e-sibling-tools/) | Zero-config tool discovery + execution | **8/8 pass** |
+
+## Repo Map
+
+| Directory | What |
+|---|---|
+| `workflows/` | POC workflow directories (the proving ground) |
+| `n8n-nodes-utcp-codemode/` | npm monorepo: `@code-mode/core` SDK + n8n community node |
+| `code-mode-mcp-server/` | Standalone MCP server wrapping CodeModeEngine (separate npm package) |
+| `repo/` | Cloned upstream [UTCP code-mode](https://github.com/universal-tool-calling-protocol/code-mode) library (read-only reference) |
+| `n8n-autopilot/` | Cloned [n8nac](https://github.com/mj-deving/n8n-autopilot) (read-only reference) |
+| `playbook/` | Portable knowledge: lifecycle framing, benchmarks, architecture |
+| `docs/` | ADRs and design documents |
+| `template/` | Scaffold source for new workflow directories |
+| `scripts/` | Tooling (new-workflow, check-secrets) |
+| `archive/` | Original research artifacts from exploration phase |
+| `null/` | Empty placeholder (artifact from early scaffolding) |
 
 ## Install
 
@@ -73,6 +89,16 @@ Add to your MCP config:
     }
   }
 }
+```
+
+The same binary works as a CLI (see [ADR-0001](docs/decisions/ADR-0001-cli-first-over-mcp-only.md)):
+
+```bash
+# Execute a code chain directly from terminal or any AI agent's Bash tool
+code-mode-tools exec "const files = fs.filesystem_list_directory({ path: '.' }); return files;" --config tools.json
+
+# Discover available tools (human-readable or --json for machines)
+code-mode-tools list-tools --config tools.json
 ```
 
 See [code-mode-tools](https://github.com/mj-deving/code-mode-mcp-server) for full setup.

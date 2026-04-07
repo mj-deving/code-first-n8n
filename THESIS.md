@@ -4,7 +4,7 @@
 
 ## The Problem
 
-n8n AI agent workflows chain 5-15+ tool calls sequentially. Each call requires a full LLM round-trip with compounding context — O(n²) token growth. A 5-tool pipeline costs ~18,000 tokens across 11 LLM calls.
+n8n AI agent workflows chain 5-15+ tool calls sequentially. Each call requires a full LLM round-trip with compounding context -- O(n^2) token growth. A 5-tool pipeline costs ~18,000 tokens across 11 LLM calls, takes 12+ seconds of latency, and requires 22 n8n nodes to wire together.
 
 n8n workflow development is click-heavy. Building, testing, and debugging happens in the UI. There's no code-first path from authoring through production.
 
@@ -29,7 +29,7 @@ Two tools that together make n8n fully code-first:
 
 **Together:** fully code-first n8n, from authoring through production. No clicking required.
 
-## Proven Results
+## Benchmark Results
 
 5-tool customer onboarding pipeline (validate → classify → score → message → report):
 

@@ -30,15 +30,31 @@ The template system supports both phases.
 
 ### Per-Workflow (inside `workflows/`)
 
+Two layout patterns coexist:
+
+**Flat layout** (existing POCs 01-03, 05):
+```
+workflows/<slug>/
+├── README.md
+├── workflow/
+│   ├── workflow.ts
+│   └── workflow.json
+├── test.json
+└── benchmark.md
+```
+
+**Categorized layout** (new workflows going forward):
 ```
 workflows/<category>/<slug>/
-├── README.md                  ← Overview, mermaid flow, nodes, test, install
+├── README.md
 ├── workflow/
-│   ├── workflow.ts            ← n8nac TypeScript definition (code-first)
-│   └── workflow.json          ← n8n JSON export (for UI import)
-├── test.json                  ← Test payloads [{input, expected}]
-└── benchmark.md               ← Before/after comparison (optional)
+│   ├── workflow.ts
+│   └── workflow.json
+├── test.json
+└── benchmark.md
 ```
+
+Existing flat workflows stay where they are (moving them would break links). New workflows should use the categorized layout with one of the categories below.
 
 ### Categories
 

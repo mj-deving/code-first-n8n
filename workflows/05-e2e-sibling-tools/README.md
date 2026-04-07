@@ -56,10 +56,13 @@ n8n AI Agent
 | Error handling | **Pass** | Invalid tool calls handled gracefully |
 | Full E2E round-trip | **Pass** | 100+200=300 via sibling tool, multi-step 17+25=42→42*3=126 |
 
-### E2E Test Results (2026-04-07)
+### Historical: Early E2E Results (exec 82, before serialization fix)
+
+> These results predate the serialization fix (commit `8006b21`). Kept for context only.
+> The `[object Object]` bug described below is resolved. Current state is 8/8 pass (exec 92-93).
 
 **LLM:** Claude Sonnet 4 via OpenRouter
-**Execution 82 (success):**
+**Execution 82:**
 
 ```
 Input:  {"prompt": "Use the calculator tool to compute 47 * 89, then add 123 to the result."}
@@ -67,13 +70,12 @@ Output: "The final result is 4306" (correct: 47×89=4183, 4183+123=4306)
 ```
 
 **What happened:**
-1. Claude wrote TypeScript calling `Calculator_Tool()` inside sandbox ✅
-2. Sandbox routed call to real Calculator Tool node via siblingAdapter ✅
-3. Calculator Tool executed but response came back as `[object Object]` ❌
-4. Claude caught the error, retried 3 more times (same result)
-5. Claude fell back to direct computation in sandbox → correct answer ✅
+1. Claude wrote TypeScript calling `Calculator_Tool()` inside sandbox
+2. Sandbox routed call to real Calculator Tool node via siblingAdapter
+3. Calculator Tool executed but response came back as `[object Object]` (serialization bug)
+4. Claude fell back to direct computation in sandbox -- correct answer
 
-**Root cause:** The siblingAdapter's `CallToolFn` returns the LangChain tool result, but the sandbox bridge serializes it as `[object Object]` instead of the actual value. The tool call routing works; the response serialization doesn't.
+**Root cause (now fixed):** The siblingAdapter's `CallToolFn` passed an object to `tool.invoke()`, but n8n's toolCode does `JSON.parse(query)` internally. Passing an object caused `[object Object]`. Fix: `tool.invoke(JSON.stringify(args))` in commit `8006b21`.
 
 ### Resolved Blockers
 
@@ -95,8 +97,7 @@ Output: "The final result is 4306" (correct: 47×89=4183, 4183+123=4306)
 - [x] siblingAdapter with 10 unit tests
 - [x] Set-based O(1) dispatch (post /simplify review)
 - [x] WF11 created on n8n with Calculator sibling
-- [x] 7/8 E2E criteria pass (Claude via OpenRouter, exec 82)
-- [x] Full E2E round-trip attempted — correct answer but via fallback
+- [x] 8/8 E2E criteria pass (Claude via OpenRouter, exec 92-93)
 - [x] Fix args serialization bug (commit `8006b21` → `420150a` — JSON round-trip for clean args)
 - [x] Fix tool description (commit `420150a` — explicit sibling call syntax + IMPORTANT instruction)
 - [x] Fix Calculator Tool code (handle both string and object `query` input)
@@ -106,7 +107,6 @@ Output: "The final result is 4306" (correct: 47×89=4183, 4183+123=4306)
 
 ## What's Next
 
-1. **Fix serialization bug** — siblingAdapter CallToolFn result needs JSON.stringify before bridge returns to sandbox
-2. Re-run WF11 → verify Calculator result flows back as usable data
-3. Export WF11 as `.workflow.ts`
-4. Test with multiple siblings (Calculator + HTTP Tool + Custom Function)
+1. Export WF11 as `.workflow.ts`
+2. Write automated E2E test (`test.ts`)
+3. Test with multiple siblings (Calculator + HTTP Tool + Custom Function)
