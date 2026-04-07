@@ -55,7 +55,7 @@ This repo is a **proving ground**. Each POC template in `pocs/` proves one layer
 | POC | Proves | Status |
 |---|---|---|
 | [01 — Customer Onboarding](pocs/01-customer-onboarding/) | Runtime: 96% token savings | Benchmarked |
-| 02 — MCP Filesystem | Runtime + MCP: real file ops in sandbox | Planned |
+| [02 — MCP Filesystem](pocs/02-mcp-filesystem/) | Runtime + MCP: real file ops in sandbox | Verified |
 | 03 — Multi-Agent Dispatch | Architecture: 16 nodes → 1 code block | Planned |
 | 04 — Dev Loop | Full lifecycle: n8nac → code-mode end-to-end | Planned |
 | 05 — E2E Sibling Tools | Auto-register: zero-config tool discovery | Planned |
