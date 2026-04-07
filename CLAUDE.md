@@ -18,13 +18,65 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `TEMPLATE.md` — What every workflow directory must contain
 - `template/` — Scaffold template for new workflows
 - `scripts/` — Shared tooling (new-workflow.sh, check-secrets.sh)
-- `AGENTS.md` — AI agent guidelines for workflow development
 - `n8n-nodes-utcp-codemode/` — n8n community node (published, npm)
 - `code-mode-mcp-server/` — Standalone MCP server (published, npm)
 - `repo/` — Cloned upstream `universal-tool-calling-protocol/code-mode` (read-only)
 - `n8n-autopilot/` — Cloned `mj-deving/n8n-autopilot` (read-only)
 - `archive/` — Original research artifacts from exploration phase
 - `STATUS.md` — Project state, version history, links
+
+## Workflow Development
+
+### Creating a New Workflow
+
+```bash
+./scripts/new-workflow.sh <category>/<name> "<Display Name>"
+# Example:
+./scripts/new-workflow.sh agents/06-slack-triage "Slack Message Triage"
+```
+
+Categories: `agents`, `pipelines`, `triggers`, `utilities`
+
+### Development Cycle
+
+1. Scaffold → `./scripts/new-workflow.sh`
+2. Build → write workflow.ts or build in n8n UI
+3. Deploy → `npx n8nac push <filename>.workflow.ts`
+4. Test → POST to webhook, check with n8n API
+5. Document → fill README.md (mermaid, nodes, test payloads)
+6. Benchmark → compare before/after if applicable
+7. Commit → git add + commit
+
+### n8nac Commands
+
+```bash
+npx n8nac list                     # Status of all workflows
+npx n8nac pull <id>               # Download from n8n
+npx n8nac push <filename>          # Upload (FILENAME only, no path!)
+npx n8nac verify <id>             # Live validation
+npx n8nac skills search "topic"   # Research nodes
+```
+
+### Code-Mode Patterns (inside sandbox)
+
+```typescript
+// MCP tools (registered via tool sources):
+const files = fs.filesystem_list_directory({ path: "/data" });
+
+// Sibling tools (auto-registered from connected nodes):
+const result = sibling.calculator({ a: 100, b: 200 });
+
+// Return result to agent:
+return { answer: result };
+```
+
+### Workflow Rules
+
+1. Every workflow directory follows the structure in `template/`
+2. Mermaid diagram required in every workflow README
+3. Test payloads in `test.json` for webhook-triggered workflows
+4. Run `scripts/check-secrets.sh` before committing
+5. Never hardcode credentials — use n8n credential references
 
 ## Build & Test (n8n-nodes-utcp-codemode)
 

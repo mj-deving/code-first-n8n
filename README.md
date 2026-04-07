@@ -38,7 +38,7 @@ Each POC proves one layer of the thesis with real data:
 | [01 — Customer Onboarding](workflows/01-customer-onboarding/) | Runtime: 96% token savings | Benchmarked |
 | [02 — MCP Filesystem](workflows/02-mcp-filesystem/) | Real file operations through MCP in sandbox | Verified |
 | [03 — Multi-Agent Dispatch](workflows/03-multi-agent-dispatch/) | 16-node workflow → 1 code block | Analyzed |
-| 04 — Dev Loop | Full lifecycle: n8nac → code-mode end-to-end | Planned |
+| [04 — Dev Loop](workflows/agents/04-dev-loop/) | Full lifecycle: n8nac → code-mode end-to-end | Designed |
 | [05 — E2E Sibling Tools](workflows/05-e2e-sibling-tools/) | Zero-config tool discovery + execution | **8/8 pass** |
 
 ## Install
@@ -136,7 +136,7 @@ This scaffolds a complete workflow directory from [template/](template/) with RE
 | [Playbook: Lifecycle](playbook/lifecycle.md) | Portable framing of the code-first n8n story |
 | [Playbook: Benchmarks](playbook/benchmarks.md) | Token savings data, methodology, cost projections |
 | [Playbook: Architecture](playbook/architecture.md) | How @code-mode/core, n8n node, and MCP server fit together |
-| [AGENTS.md](AGENTS.md) | AI agent guidelines for workflow development |
+| [CLAUDE.md](CLAUDE.md) | Build commands, architecture, workflow development guide |
 
 ## LLM Compatibility
 
