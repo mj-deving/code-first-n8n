@@ -8,10 +8,14 @@
 
 A TypeScript/Python library ([`@utcp/code-mode`](https://github.com/universal-tool-calling-protocol/code-mode)) that lets AI agents execute workflows through **code execution** instead of traditional JSON tool calling. The LLM writes a single TypeScript block that chains all tool calls in an isolated-vm sandbox — no LLM round-trips between steps.
 
-**Core API:**
-- `CodeModeUtcpClient.create()` → initialize
-- `registerManual()` → register tool sources (MCP, HTTP, File, CLI)
-- `callToolChain(code, timeout, memoryLimit)` → execute in sandbox, returns `{ result, logs }`
+**Core API (v2.1 — @code-mode/core):**
+- `CodeModeEngine.create()` → initialize
+- `registerToolSource(config)` → register tool sources (MCP, HTTP)
+- `execute(code, { timeout, memoryLimit, enableTrace, externalTools?, externalCallToolFn? })` → sandbox execution → `ExecutionResult`
+- `getToolDescription()` → LLM prompt string
+- `close()` → release resources
+
+*Note: The upstream `@utcp/code-mode` library used `CodeModeUtcpClient` — our `@code-mode/core` wraps it as `CodeModeEngine` with caching, tracing, and external tool support.*
 
 **Benchmarks:** 67% faster (simple), 75% (medium), 88% (complex) vs traditional tool calling.
 

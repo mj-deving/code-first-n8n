@@ -138,19 +138,22 @@ export class CodeModeTool implements INodeType {
     const timeout = this.getNodeParameter('timeout', 0) as number;
     const memoryLimit = this.getNodeParameter('memoryLimit', 0) as number;
 
-    // Initialize code-mode client with registered tool sources
-    const client = await CodeModeUtcpClient.create();
-    // Register tool sources from node configuration...
+    // Initialize code-mode engine (v2.1 — @code-mode/core)
+    const { CodeModeEngine } = await import('code-mode-core');
+    const engine = await CodeModeEngine.create();
+    // Register tool sources, discover siblings, etc.
 
     const tool = new DynamicStructuredTool({
       name: 'execute_code_chain',
-      description: `Execute TypeScript code with access to registered tools.
-        Available tools: ${await client.getAllToolsTypeScriptInterfaces()}
-        Write code that calls tools as functions and returns a result.`,
+      description: await engine.getToolDescription(),
       schema: z.object({ code: z.string().describe('TypeScript code to execute') }),
       func: async ({ code }) => {
-        const { result, logs } = await client.callToolChain(code, timeout, memoryLimit);
-        return JSON.stringify({ result, logs });
+        const result = await engine.execute(code, {
+          timeout, memoryLimit, enableTrace: false,
+          // v2.1: external tools from sibling tool sub-nodes
+          // externalTools, externalCallToolFn
+        });
+        return JSON.stringify({ result: result.result, logs: result.logs });
       },
     });
 

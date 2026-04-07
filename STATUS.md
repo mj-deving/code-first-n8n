@@ -1,20 +1,27 @@
-# n8n-nodes-utcp-codemode — Project Status
+# Code-First n8n Proving Ground — Status
 
-> Single source of truth for project state. Updated every session.
-> Last updated: 2026-03-21
+> Proving ground for the n8nac + code-mode lifecycle thesis.
+> Produces verified POC templates for n8n automation use cases.
+> Last updated: 2026-04-07
+
+## Thesis
+
+See [THESIS.md](THESIS.md) — n8nac owns dev-time, code-mode owns runtime, together they cover the full lifecycle.
 
 ## Quick Links
 
 | Resource | Location |
 |---|---|
-| **npm** | [n8n-nodes-utcp-codemode](https://www.npmjs.com/package/n8n-nodes-utcp-codemode) (v0.1.3) |
-| **GitHub** | [mj-deving/n8n-nodes-utcp-codemode](https://github.com/mj-deving/n8n-nodes-utcp-codemode) |
-| **Community Post** | `n8n-community-post.md` (ready to post in "Built with n8n") |
-| **Benchmarks** | `benchmark-results.md` — 96% token savings on 5-tool pipeline |
-| **Research** | `code-mode-synthesis.md` — full synthesis of UTCP + n8n integration |
-| **Reference** | `n8n-code-mode-reference.md` — 12-section technical elaboration |
+| **Thesis** | [THESIS.md](THESIS.md) — the lifecycle framing |
+| **Playbook** | [playbook/](playbook/) — portable knowledge (lifecycle, benchmarks, architecture) |
+| **POCs** | [pocs/](pocs/) — proven automation templates |
+| **npm (n8n)** | [n8n-nodes-utcp-codemode@2.1.0](https://www.npmjs.com/package/n8n-nodes-utcp-codemode) |
+| **npm (MCP)** | [code-mode-mcp-server@0.1.0](https://www.npmjs.com/package/code-mode-mcp-server) |
+| **GitHub (n8n)** | [mj-deving/n8n-nodes-utcp-codemode](https://github.com/mj-deving/n8n-nodes-utcp-codemode) |
+| **GitHub (MCP)** | [mj-deving/code-mode-mcp-server](https://github.com/mj-deving/code-mode-mcp-server) |
+| **Archive** | [archive/](archive/) — original research artifacts |
 
-## Current Version: 2.0.0
+## Current Version: 2.1.0
 
 | Version | Date | Changes |
 |---|---|---|
@@ -27,7 +34,7 @@
 | 0.2.1 | 2026-03-21 | rebrand: drop UTCP from user-facing text, lead with token savings |
 | 1.1.0 | 2026-03-21 | feat: output transparency, token savings estimation, example workflow |
 | **2.0.0** | **2026-03-21** | **feat: monorepo extraction — @code-mode/core SDK + sandbox replay + caching** |
-| 2.1.0 | planned | feat: auto-register sibling tool sub-nodes (gated on user signal) |
+| **2.1.0** | **2026-03-21** | **feat: auto-register sibling tool sub-nodes, externalTools API** |
 
 ## Feature Status
 
@@ -40,7 +47,8 @@
 | **Internal setup caching** | **SHIPPED v2.0** | Always-on, FIFO at 16 entries |
 | **Engine lifecycle caching** | **SHIPPED v2.0** | Cached by configHash across supplyData() calls |
 | Lazy imports (Windows compat) | **SHIPPED** | All heavy deps lazy-loaded in supplyData() |
-| npm published | **SHIPPED** | v1.1.0 on npmjs.com (v2.0.0 pending publish) |
+| **Auto-register siblings** | **SHIPPED v2.1** | AiTool input, siblingAdapter, externalTools API |
+| npm published | **SHIPPED** | code-mode-core@2.1.0 + n8n-nodes-utcp-codemode@2.1.0 on npmjs.com |
 | Public GitHub repo | **SHIPPED** | Clean standalone repo |
 | MCP transport support | **WORKING** | 14 filesystem tools register, sandbox calls work |
 | MCP end-to-end with Claude | **WORKING** | Claude via OpenRouter reads real files through MCP sandbox |
@@ -48,6 +56,9 @@
 | Community forum post | **POSTED** | Posted to "Built with n8n" — flagged for AI content, rewritten |
 | Real MCP demo workflow | **WORKING** | WF10 on n8n with OpenRouter Chat Model node + filesystem MCP |
 | OpenRouter integration | **WORKING** | Use `lmChatOpenRouter` node type, not `lmChatOpenAi` |
+| E2E sibling tools test | **PARTIAL** | WF11 created, 7/8 criteria pass. Blocked on LLM (Gemini sends empty args, OpenRouter no credits) |
+| Strategic ideation | **COMPLETE** | 34 ideas, 9 hypotheses — `strategic-initiatives-ideation.md` |
+| **MCP server (code-mode-as-server)** | **BUILT v0.1** | Standalone package, 22 tests, E2E verified. [GitHub](https://github.com/mj-deving/code-mode-mcp-server) |
 
 ## Benchmark Summary
 
@@ -68,8 +79,9 @@
 | zQ4KCniPiiOS3EEG | WF8 — Benchmark Traditional | 5 tools, 11 LLM calls |
 | WVeyUVbK32wI6ZGQ | WF9 — Benchmark Code-Mode | 1 tool, 1 LLM call |
 | Ml4GL2HRJCSpCXtM | WF10 — MCP Filesystem Test | Real MCP integration test |
+| pxCt6Wv92qqUbznT | WF11 — E2E Sibling Tools Test | Calculator sibling → Code-Mode → Agent |
 
-## Architecture (v2.0)
+## Architecture (v2.1)
 
 ```
 @code-mode/core (platform-agnostic):
@@ -79,12 +91,17 @@
     .getToolDescription()           → LLM prompt string
     .close()                        → releases client + MCP transports
 
+  ExecutionOptions (v2.1):
+    timeout, memoryLimit, enableTrace     → existing
+    externalTools?: ToolLike[]            → NEW: merge with registered tools
+    externalCallToolFn?: CallToolFn       → NEW: route external tool calls
+
 n8n wrapper (thin):
-  AI Agent → execute_code_chain(code) → CodeModeTool
-    → await import('@code-mode/core')
-    → CodeModeEngine (cached by configHash)
-    → engine.execute(code, { timeout, memoryLimit, enableTrace })
-    → { result, logs, error?, _codeMode: { trace?, stats?, tokenEstimate } }
+  [Sibling Tools] → Code-Mode Tool → AI Agent
+    → getInputConnectionData(AiTool) discovers siblings
+    → siblingAdapter.ts converts LangChain → ToolLike[] + CallToolFn
+    → engine.execute(code, { ..., externalTools, externalCallToolFn })
+    → sandbox calls both manual.mcp_tool() and sibling.toolName()
 ```
 
 ## MCP Configuration (working format)
@@ -107,26 +124,51 @@ n8n wrapper (thin):
 
 Key: `transport: "stdio"` is required. Without it, `@utcp/mcp` throws "Unsupported MCP transport: undefined".
 
-## Strategic Direction (decided 2026-03-21, council + research)
+## Strategic Direction (updated 2026-03-23)
 
-**First-mover confirmed.** No n8n competitor. Pattern validated by Anthropic PTC, LangGraph CodeAct, OpenAI Code Interpreter. See `project_strategic_direction.md` for full analysis.
+**First-mover confirmed.** No n8n competitor. Pattern validated by Anthropic PTC, LangGraph CodeAct, OpenAI Code Interpreter.
+
+**Platform expansion decided (2026-03-23):** Build code-mode as an MCP server — universal adapter that serves Claude Desktop, Claude Code, Cursor, Windsurf, LangChain, CrewAI, and any MCP-compatible client. One deliverable → maximum reach.
+
+**Key strategic insight:** An MCP server is NOT the "MCP Gateway proxy" (which was architecturally flawed — can't control external LLM's prompt). It's code-mode AS a server: exposes `execute_code_chain` as a real MCP tool that clients explicitly call. The LLM sees the tool, writes code, sandbox executes it.
+
+**Moat vs upstream repo:** The OG `@utcp/code-mode` is a raw client library. `@code-mode/core` adds: production engine with setup caching (FIFO/16), execution tracing (ToolCallRecord[]), external tool composition API, security hardening, collision-safe bridges, 67 tests. That's the value — not the sandbox itself, but the production-ready engine around it.
+
+### Design Questions (open, 2026-03-23)
+
+1. **Tool registration model:** Should the MCP server pre-register tool sources at startup (config file) or let clients register tools dynamically via MCP resource/prompt protocol?
+2. **Multi-tool-source composition:** When a client connects, do they bring their own MCP tools (forwarded through code-mode for optimization), or only use tools code-mode already has registered?
+3. **Security boundary:** The sandbox runs arbitrary code from the LLM. As an MCP server, we accept code from external clients. What sandboxing guarantees do we promise? Is isolated-vm sufficient for multi-client?
+4. **Stateless vs stateful:** Should the engine persist between MCP calls (keep registered tools hot) or create fresh per-call? Performance vs memory trade-off.
+5. **Platform-specific wrappers still needed?** If MCP server covers Claude/Cursor/LangChain(via adapter)/CrewAI — do we still need native LangChain/CrewAI wrappers, or is MCP sufficient?
+
+See `strategic-initiatives-ideation.md` for full 34-idea analysis with intern critical review.
 
 ## Roadmap
 
 1. ~~**Rebrand** — drop UTCP from user-facing text~~ ✅ done (v0.2.1)
 2. ~~**v2.0: Core SDK extraction** — @code-mode/core monorepo~~ ✅ done (v2.0.0)
-3. **npm publish v2.0** — publish @code-mode/core (new), update n8n-nodes-utcp-codemode
-4. **Distribution** — repost community content (dev.to / Reddit / LinkedIn)
-5. **v2.1: Auto-register siblings** — detect sibling tool sub-nodes, register automatically
-6. **v3.0 (vision): Workflow composition** — sandbox calls n8n sub-workflows as functions
-7. **Revoke stale npm tokens** — two tokens shared in chat session
+3. ~~**npm publish v2.0** — publish both packages~~ ✅ done (v2.0.0)
+4. ~~**v2.1: Auto-register siblings** — detect sibling tool sub-nodes~~ ✅ done (v2.1.0)
+5. ~~**v3.0: MCP Server** — code-mode as an MCP server~~ ✅ built (v0.1.0, [repo](https://github.com/mj-deving/code-mode-mcp-server))
+5b. **npm publish MCP server** — `npm publish` code-mode-mcp-server@0.1.0 ← **NEXT**
+6. **Token Savings Calculator** — lead gen landing page (2-3 days)
+7. **Distribution** — dev.to / Reddit / LinkedIn
+8. **Revoke stale npm tokens** — two tokens shared in chat session
+9. **v4.0 (vision): Multi-sandbox orchestration** — fan-out/fan-in parallel execution
+10. **Published benchmark H6.2** — "Scaling Parallel Sandbox Execution: Where V8 Isolates Hit the Wall"
 
 ## Known Issues
 
-- **Gemini tool-calling weakness** — Gemini 2.0 Flash calls MCP tools but returns empty/generic results. Needs explicit "You MUST call X" prompting and still struggles.
+- **Gemini tool-calling weakness** — Gemini 2.0 Flash calls execute_code_chain but sends empty args `{}` (no code parameter). Proven in WF11 E2E test (execution 79). Claude works; Gemini does not.
+- **OpenRouter credits depleted** — E2E sibling test blocked. Need to top up at openrouter.ai/settings/credits.
 - **Double namespace** — MCP tools register as `manual.server_toolname` (e.g., `fs.filesystem_read_file`). This is a UTCP convention, not a bug.
 - **isolated-vm native addon** — may need rebuild after Node.js version changes
 - **Windows npx** — use full `node path/to/module.js` instead of `npx` for MCP servers spawned from n8n
+- **MCP presets deprecated** — All `@modelcontextprotocol/server-*` packages archived by Anthropic (2025). Still functional on npm but no security patches. `server-postgres` has known SQL injection vulnerability (Datadog). `server-sqlite` removed from npm entirely.
+- **Staging monorepo needs npm install** — Junction-linked staging dir at `C:\Users\User\.n8n\n8n-nodes-utcp-codemode-src\` needs `npm install` for code-mode-core to resolve. Fixed 2026-03-21.
+- **n8n community forum flagged** — Account flagged for AI content. Distribution bottleneck.
+- **Token costs dropping** — GPT-4o-mini is 97% cheaper than GPT-4. "96% savings" pitch weakens as base costs fall. Lead with latency/complexity reduction alongside token savings.
 
 ## Document Index
 
@@ -139,5 +181,6 @@ Key: `transport: "stdio"` is required. Without it, `@utcp/mcp` throws "Unsupport
 | `n8n-code-mode-reference.md` | Full technical elaboration | Developers |
 | `n8n-community-post.md` | Forum post draft | n8n community |
 | `n8n-nodes-utcp-codemode/README.md` | npm package README | Package users |
+| `strategic-initiatives-ideation.md` | 34 ideas + 9 hypotheses for tasks 5,6,7 | Strategic planning |
 | `.sessions/` | Session records | Session continuity |
 | `MEMORY/WORK/` | PRDs for Algorithm runs | AI workflow |
