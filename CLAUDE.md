@@ -49,7 +49,7 @@ cd ~/projects/n8nac-tools && npm run build && npm test  # 50 tests
 
 ### n8nac
 - **Push filename only**: `npx n8nac push workflow.ts` — no path, n8nac resolves from config
-- **n8nac pull is broken**: Third-party bug — looks up API key by instanceIdentifier not host URL. Use `curl` to export from n8n REST API instead.
+- **n8nac pull needs init-auth**: Must run `n8nac init-auth` + `n8nac init-project` first. Manually editing credentials.json doesn't work — the instanceProfiles entry is missing.
 - **Init required**: Must run `n8nac init-auth` + `n8nac init-project` before pull/push. See AGENTS.md.
 
 ### Code-Mode Tool (n8n node)
