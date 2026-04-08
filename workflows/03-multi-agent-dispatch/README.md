@@ -1,71 +1,85 @@
 # POC-03: Multi-Agent Dispatch → 1 Code Block
 
+## Overview
+
+This POC documents the architectural reduction of a 16-node multi-agent dispatcher into a code-mode workflow that keeps the specialist calls but removes most orchestration plumbing. It is still design-only, but it frames how code-mode can replace switch, merge, and routing overhead with ordinary TypeScript control flow.
+
+**Trigger:** TBD <!-- TODO: document the future workflow trigger or webhook path -->  
+**Nodes:** Traditional `16`, code-mode target `3`  
+**LLM:** Gemini specialist calls remain; orchestration model setup TBD <!-- TODO: document once implemented -->  
+**Source workflow:** WF5 from `n8n-autopilot`
+
+## Flow
+
+```mermaid
+graph LR
+    A["Incoming request"] --> B["Dispatcher Agent"]
+    B --> C["Specialist A"]
+    B --> D["Specialist B"]
+    B --> E["Specialist C"]
+    B --> F["Specialist D"]
+    C --> G["Merge + Quality Check"]
+    D --> G
+    E --> G
+    F --> G
+    A --> H["Code-Mode alternative"]
+    H --> I["Single TypeScript block"]
+    I --> J["Specialist API calls + aggregation + quality check"]
+```
+
+## Nodes
+
+| Node | Type | Purpose |
+|---|---|---|
+| Dispatcher Agent | AI Agent | Routes the request to the correct specialist paths in the traditional design |
+| Specialist Agents | AI Agents | Perform the domain-specific sub-tasks |
+| Merge + Quality Check | Merge / AI Agent | Aggregates specialist outputs and verifies quality |
+| Code-Mode Tool | Tool sub-node | Planned replacement for the routing and merge logic |
+| Single TypeScript block | Generated code | Planned orchestration layer for dispatch, aggregation, and return |
+
+## Test
+
+<!-- TODO: add a real curl command after the code-mode variant is implemented -->
+```bash
+curl -X POST http://<n8n-host>/webhook/<wf5-codemode-endpoint> \
+  -H "Content-Type: application/json" \
+  -d '{"request":"<payload that exercises multiple specialists>"}'
+```
+
+Expected output: a structured response showing specialist outputs, aggregation, and quality-check results from one code-mode execution.
+
+## Benchmark
+
+<!-- TODO: run the benchmark once both the traditional and code-mode variants are implemented -->
+| Metric | Traditional WF5 | Code-mode target | Status |
+|---|---|---|---|
+| Node count | 16 | 3 | Design target only |
+| Specialist LLM calls | 4 | 4 | Design target only |
+| Orchestration layer | Dispatcher + switch + merge + quality check | One TypeScript block | Design target only |
+
+## Install
+
+```bash
+# n8nac push
+# TODO: create and export the code-mode workflow, then replace this placeholder.
+npx n8nac push <path-to-wf5-codemode-workflow.ts>
+```
+
+```bash
+# Import via JSON
+# TODO: export the workflow from n8n, then document the JSON import steps here.
+```
+
 ## What This Proves
 
 - **Lifecycle layer:** Architecture
 - **Thesis claim:** Complex multi-agent orchestration workflows collapse into a single code-mode execution, eliminating orchestration overhead while preserving sub-agent LLM calls
 
-## The Scenario
-
-A 16-node dispatcher workflow from n8n-autopilot (WF5) that routes incoming requests to 4 specialist agents, each calling Gemini, then aggregates results through a quality check. Traditional architecture:
-
-```
-Webhook → Dispatcher Agent (LLM) → Switch Node
-  ├→ Specialist A (LLM) → Tools → Response
-  ├→ Specialist B (LLM) → Tools → Response
-  ├→ Specialist C (LLM) → Tools → Response
-  └→ Specialist D (LLM) → Tools → Response
-     → Merge → QualityCheck Agent (LLM) → Output
-```
-
-**16 nodes. 6+ LLM calls. Multiple orchestration round-trips.**
-
-## The Code-Mode Alternative
-
-```
-Webhook → Code-Mode Tool → AI Agent
-  → LLM writes TypeScript:
-     1. Parse input, determine which specialists to invoke
-     2. Call specialist APIs (Gemini) directly
-     3. Aggregate results
-     4. Run quality check
-     5. Return structured output
-  → 1 code-mode execution
-```
-
-**3 nodes. The 4 Gemini specialist calls remain (they're the real work). The orchestration overhead — dispatcher, switch, merge, quality check routing — disappears.**
-
-## What This Demonstrates
-
-1. **Orchestration elimination** — The n8n switch/merge/routing nodes are replaced by TypeScript control flow inside the sandbox
-2. **LLM calls preserved** — Sub-agent calls to Gemini still happen (registered as tools). Code-mode doesn't replace LLM reasoning, it replaces the orchestration plumbing
-3. **Complexity reduction** — 16 nodes → 3 nodes. The workflow is readable as code, not as a visual graph
-4. **Composability** — Adding a 5th specialist is one line of code, not 3+ new nodes with connections
-
-## Source Material
-
-- **WF5** from n8n-autopilot: 16-node multi-agent dispatcher pattern
-- Analyzed in `archive/code-mode-synthesis.md:90`
-- n8n-autopilot repo: `~/projects/code-mode/n8n-autopilot/`
-
 ## Status
 
 - [x] Pattern identified and analyzed (from n8n-autopilot WF5)
 - [x] Architecture documented (traditional vs code-mode)
-- [ ] `workflow.ts` — Code-mode version of WF5 (TODO: needs Gemini API as UTCP tool)
+- [ ] `workflow.ts` — Code-mode version of WF5 (TODO: needs Gemini API as tool source)
 - [ ] `workflow-traditional.ts` — Original WF5 exported via n8nac
-- [ ] Benchmark: orchestration overhead comparison
+- [ ] Benchmark executed
 - [ ] `test.ts` — automated test comparing both approaches
-
-## Prerequisites
-
-- Gemini API registered as a UTCP tool source in code-mode
-- n8n running with both WF5 (traditional) and WF5-codemode variants
-- Test payloads that exercise all 4 specialist paths
-
-## What's Next
-
-1. Register Gemini API as HTTP tool source in code-mode
-2. Build code-mode WF5 variant on n8n
-3. Run same payloads through both, compare node count, latency, and token usage
-4. Export both as `.workflow.ts` for reproducibility

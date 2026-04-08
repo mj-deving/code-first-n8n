@@ -2,7 +2,7 @@
 
 > Proving ground for the n8nac + code-mode lifecycle thesis.
 > Produces verified POC templates for n8n automation use cases.
-> Last updated: 2026-04-07
+> Last updated: 2026-04-08
 
 ## Thesis
 
@@ -53,10 +53,11 @@ See [THESIS.md](THESIS.md) — n8nac owns dev-time, code-mode owns runtime, toge
 | MCP transport support | **WORKING** | 14 filesystem tools register, sandbox calls work |
 | MCP end-to-end with Claude | **WORKING** | Claude via OpenRouter reads real files through MCP sandbox |
 | MCP end-to-end with Gemini | **BROKEN** | Gemini calls tools but returns empty results |
+| **Dev loop workflow (WF04)** | **PROVEN** | Builds + deploys + activates a workflow in `11.5s` for about `$0.05` using Claude Haiku 4.5 via OpenRouter |
 | Community forum post | **POSTED** | Posted to "Built with n8n" — flagged for AI content, rewritten |
 | Real MCP demo workflow | **WORKING** | WF10 on n8n with OpenRouter Chat Model node + filesystem MCP |
-| OpenRouter integration | **WORKING** | Use `lmChatOpenRouter` node type, not `lmChatOpenAi` |
-| E2E sibling tools test | **PARTIAL** | WF11 created, 7/8 criteria pass. Blocked on LLM (Gemini sends empty args, OpenRouter no credits) |
+| Default LLM recommendation | **HAIKU VIA OPENROUTER** | Best current cost/performance for n8n tool calling; Gemini is not reliable here |
+| E2E sibling tools test | **PROVEN** | WF11 passes `8/8` criteria with Claude via OpenRouter after the serialization and prompt fixes |
 | Strategic ideation | **COMPLETE** | 34 ideas, 9 hypotheses — `strategic-initiatives-ideation.md` |
 | **MCP server (code-mode-as-server)** | **BUILT v0.1** | Standalone package, 22 tests, E2E verified. [GitHub](https://github.com/mj-deving/code-mode-mcp-server) |
 
@@ -80,6 +81,7 @@ See [THESIS.md](THESIS.md) — n8nac owns dev-time, code-mode owns runtime, toge
 | WVeyUVbK32wI6ZGQ | WF9 — Benchmark Code-Mode | 1 tool, 1 LLM call |
 | Ml4GL2HRJCSpCXtM | WF10 — MCP Filesystem Test | Real MCP integration test |
 | pxCt6Wv92qqUbznT | WF11 — E2E Sibling Tools Test | Calculator sibling → Code-Mode → Agent |
+| EBMbixqklugU5WtQ | WF04 — Dev Loop | AI builds, deploys, and activates another workflow in one execution |
 
 ## Architecture (v2.1)
 
@@ -160,8 +162,7 @@ See `strategic-initiatives-ideation.md` for full 34-idea analysis with intern cr
 
 ## Known Issues
 
-- **Gemini tool-calling weakness** — Gemini 2.0 Flash calls execute_code_chain but sends empty args `{}` (no code parameter). Proven in WF11 E2E test (execution 79). Claude works; Gemini does not.
-- **OpenRouter credits depleted** — E2E sibling test blocked. Need to top up at openrouter.ai/settings/credits.
+- **Gemini tool-calling weakness** — Gemini 2.0 Flash and Gemini 2.5 Flash are not reliable for n8n tool calling; the agent receives `null` or empty tool args instead of usable payloads. Claude works; Gemini does not.
 - **Double namespace** — MCP tools register as `manual.server_toolname` (e.g., `fs.filesystem_read_file`). This is a UTCP convention, not a bug.
 - **isolated-vm native addon** — may need rebuild after Node.js version changes
 - **Windows npx** — use full `node path/to/module.js` instead of `npx` for MCP servers spawned from n8n
