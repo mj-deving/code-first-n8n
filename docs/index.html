@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code-First n8n — Proving Ground</title>
+<meta name="description" content="96% fewer tokens. 80% faster. 86% fewer nodes. The code-first n8n proving ground.">
+<meta property="og:title" content="Code-First n8n — Proving Ground">
+<meta property="og:description" content="96% fewer tokens. 80% faster. 86% fewer nodes.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--font-body:'Geist',system-ui,sans-serif;--font-mono:'Geist Mono','SF Mono',Consolas,monospace;--bg:#0d1117;--surface:#161b22;--surface-elevated:#1c2333;--border:rgba(255,255,255,0.06);--border-bright:rgba(255,255,255,0.12);--text:#e6edf3;--text-dim:#8b949e;--accent:#22d3ee;--accent-dim:rgba(34,211,238,0.12);--green:#34d399;--green-dim:rgba(52,211,153,0.12);--red:#f87171;--red-dim:rgba(248,113,113,0.08);--amber:#fbbf24;--radius:10px}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+.container{max-width:960px;margin:0 auto;padding:0 24px}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,17,23,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px}
+nav .nav-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+nav .nav-brand{font-family:var(--font-mono);font-size:0.85rem;font-weight:600;color:var(--accent);text-decoration:none}
+nav .nav-links{display:flex;gap:24px}
+nav .nav-links a{font-size:0.8rem;font-weight:500;color:var(--text-dim);text-decoration:none;transition:color 0.2s}
+nav .nav-links a:hover{color:var(--text)}
+.hero{padding:120px 24px 64px;text-align:center;background-image:radial-gradient(ellipse at 50% 0%,var(--accent-dim) 0%,transparent 50%)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:0.75rem;font-weight:500;color:var(--accent);border:1px solid rgba(34,211,238,0.25);border-radius:100px;padding:4px 14px;margin-bottom:20px;letter-spacing:0.03em}
+.hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:700;line-height:1.15;margin-bottom:16px;color:var(--text)}
+.hero-stats{display:flex;justify-content:center;gap:32px;margin-bottom:24px;flex-wrap:wrap}
+.hero-stat{font-family:var(--font-mono);font-size:1rem;font-weight:600}
+.hero-stat .num{color:var(--green)}
+.hero-stat .label{color:var(--text-dim);font-size:0.8rem;font-weight:400}
+.hero p{font-size:1rem;color:var(--text-dim);max-width:640px;margin:0 auto;line-height:1.7}
+section{padding:64px 0}
+.section-label{font-family:var(--font-mono);font-size:0.7rem;font-weight:500;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.section-label .dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.dot-accent{background:var(--accent)}.dot-green{background:var(--green)}.dot-red{background:var(--red)}.dot-amber{background:var(--amber)}
+.section-title{font-size:clamp(1.3rem,3vw,1.8rem);font-weight:700;margin-bottom:32px;color:var(--text)}
+.timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;position:relative}
+.timeline::before{content:'';position:absolute;top:24px;left:calc(16.67% + 12px);right:calc(16.67% + 12px);height:2px;background:var(--border-bright)}
+.timeline-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center;position:relative}
+.timeline-dot{width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);margin:0 auto 16px;position:relative;z-index:1}
+.timeline-item:first-child .timeline-dot{background:var(--text-dim)}
+.timeline-item:nth-child(2) .timeline-dot{background:var(--amber)}
+.timeline-year{font-family:var(--font-mono);font-size:0.7rem;color:var(--accent);font-weight:600;margin-bottom:8px}
+.timeline-item:first-child .timeline-year{color:var(--text-dim)}
+.timeline-item:nth-child(2) .timeline-year{color:var(--amber)}
+.timeline-name{font-size:1rem;font-weight:600;margin-bottom:6px}
+.timeline-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.5}
+.benchmark-grid{display:grid;grid-template-columns:1fr 80px 1fr;gap:24px;align-items:center}
+.benchmark-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.benchmark-card.bad{border-color:rgba(248,113,113,0.15)}.benchmark-card.good{border-color:rgba(52,211,153,0.15)}
+.benchmark-card h3{font-family:var(--font-mono);font-size:0.75rem;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.benchmark-card.bad h3{color:var(--red)}.benchmark-card.good h3{color:var(--green)}
+.benchmark-stat{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--border)}
+.benchmark-stat:last-child{border-bottom:none}
+.benchmark-stat .lbl{font-size:0.8rem;color:var(--text-dim)}.benchmark-stat .val{font-family:var(--font-mono);font-size:0.9rem;font-weight:600}
+.benchmark-card.bad .val{color:var(--red)}.benchmark-card.good .val{color:var(--green)}
+.benchmark-vs{text-align:center;font-family:var(--font-mono);font-size:0.8rem;font-weight:600;color:var(--text-dim)}
+.workflow-grid{display:grid;grid-template-columns:1fr;gap:24px}
+.workflow-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.workflow-number{font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);font-weight:500;margin-bottom:6px}
+.workflow-card h3{font-size:1.1rem;font-weight:600;margin-bottom:8px}
+.workflow-card .desc{font-size:0.85rem;color:var(--text-dim);margin-bottom:16px;line-height:1.6}
+.workflow-metrics{display:flex;gap:16px;flex-wrap:wrap}
+.metric{font-family:var(--font-mono);font-size:0.75rem;padding:4px 10px;border-radius:6px;background:var(--green-dim);color:var(--green);font-weight:500}
+.workflow-status{font-family:var(--font-mono);font-size:0.7rem;color:var(--green);font-weight:500;display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.workflow-diagram{background:var(--surface-elevated);border:1px solid var(--border);border-radius:8px;padding:16px;display:flex;align-items:center;justify-content:center;min-height:100px}
+.how-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;font-family:var(--font-mono);font-size:0.8rem;line-height:2;overflow-x:auto}
+.line-trad{color:var(--red)}.line-cm{color:var(--green)}.line-dim{color:var(--text-dim)}
+.packages-table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.packages-table th,.packages-table td{padding:14px 20px;text-align:left;font-size:0.85rem;border-bottom:1px solid var(--border)}
+.packages-table th{font-family:var(--font-mono);font-size:0.7rem;font-weight:500;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.06em;background:var(--surface-elevated)}
+.packages-table tr:last-child td{border-bottom:none}
+.packages-table a{color:var(--accent);text-decoration:none}.packages-table a:hover{text-decoration:underline}
+.pkg-version{font-family:var(--font-mono);font-size:0.8rem;color:var(--green);font-weight:500}
+.links-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.link-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-decoration:none;transition:border-color 0.2s;display:block}
+.link-card:hover{border-color:var(--accent)}
+.link-card-title{font-size:0.9rem;font-weight:600;color:var(--text);margin-bottom:6px}
+.link-card-desc{font-size:0.8rem;color:var(--text-dim)}
+footer{text-align:center;padding:32px 24px;font-size:0.75rem;color:var(--text-dim);border-top:1px solid var(--border);margin-top:32px}
+footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--text)}
+.mermaid svg{max-width:100%;height:auto}
+@media(max-width:640px){.timeline{grid-template-columns:1fr}.timeline::before{display:none}.benchmark-grid{grid-template-columns:1fr}.workflow-card{grid-template-columns:1fr}.links-grid{grid-template-columns:1fr}nav .nav-links{gap:16px}nav .nav-links a{font-size:0.75rem}}
+</style>
+</head>
+<body>
+<nav><div class="nav-inner"><a href="#" class="nav-brand">code-mode</a><div class="nav-links"><a href="#evolution">Evolution</a><a href="#benchmark">Benchmark</a><a href="#workflows">Workflows</a><a href="#packages">Packages</a></div></div></nav>
+<div class="hero" id="hero"><div class="tag">proving ground</div><h1>Code-First n8n</h1><div class="hero-stats"><div class="hero-stat"><span class="num">96%</span> <span class="label">fewer tokens</span></div><div class="hero-stat"><span class="num">80%</span> <span class="label">faster</span></div><div class="hero-stat"><span class="num">86%</span> <span class="label">fewer nodes</span></div></div><p>This proving ground demonstrates that n8nac + code-mode cover the entire n8n workflow lifecycle &mdash; from authoring through production.</p></div>
+<div class="container">
+<section id="evolution"><div class="section-label"><span class="dot dot-accent"></span> Evolution</div><div class="section-title">How we got here</div><div class="timeline"><div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-year">2025</div><div class="timeline-name">n8n-autopilot</div><div class="timeline-desc">Built workflows manually, felt the pain. Every node wired by hand, every change a fragile drag-and-drop.</div></div><div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-year">2026 Q1</div><div class="timeline-name">n8nac</div><div class="timeline-desc">Code-first development. Author workflows in TypeScript, push with a single command. Version control built in.</div></div><div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-year">2026 Q1/Q2</div><div class="timeline-name">code-mode</div><div class="timeline-desc">Code-first runtime. Sandboxed TypeScript execution replaces sequential LLM tool chains. One call, not eleven.</div></div></div></section>
+<section id="benchmark"><div class="section-label"><span class="dot dot-amber"></span> Benchmark</div><div class="section-title">Side-by-side comparison</div><div class="benchmark-grid"><div class="benchmark-card bad"><h3><span class="dot dot-red"></span> Traditional</h3><div class="benchmark-stat"><span class="lbl">LLM calls</span><span class="val">11</span></div><div class="benchmark-stat"><span class="lbl">Tokens</span><span class="val">18,000</span></div><div class="benchmark-stat"><span class="lbl">Latency</span><span class="val">12.5s</span></div><div class="benchmark-stat"><span class="lbl">Complexity</span><span class="val">O(n&sup2;)</span></div></div><div class="benchmark-vs">vs</div><div class="benchmark-card good"><h3><span class="dot dot-green"></span> Code-Mode</h3><div class="benchmark-stat"><span class="lbl">LLM calls</span><span class="val">1</span></div><div class="benchmark-stat"><span class="lbl">Tokens</span><span class="val">700</span></div><div class="benchmark-stat"><span class="lbl">Latency</span><span class="val">2.5s</span></div><div class="benchmark-stat"><span class="lbl">Complexity</span><span class="val">O(1)</span></div></div></div></section>
+<section id="how"><div class="section-label"><span class="dot dot-accent"></span> Architecture</div><div class="section-title">How it works</div><div class="how-block"><div class="line-dim">// Traditional: quadratic context accumulation</div><div class="line-trad">Traditional: LLM &rarr; tool &rarr; LLM &rarr; tool &rarr; ... &rarr; answer &nbsp; (11 calls, O(n&sup2;))</div><br><div class="line-dim">// Code-Mode: constant &mdash; one call, one sandbox</div><div class="line-cm">Code-Mode: &nbsp; LLM &rarr; TypeScript &rarr; sandbox &rarr; answer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (1 call, &nbsp;O(1))</div></div></section>
+<section id="workflows"><div class="section-label"><span class="dot dot-green"></span> Workflows</div><div class="section-title">5 workflows proving the thesis</div><div class="workflow-grid">
+<div class="workflow-card"><div><div class="workflow-number">01</div><h3>Customer Onboarding</h3><div class="workflow-status"><span class="status-dot"></span> Complete</div><div class="desc">Proves the core thesis: collapsing an 11-step LLM tool chain into a single sandboxed execution with 96% token savings.</div><div class="workflow-metrics"><span class="metric">96% token savings</span><span class="metric">91% fewer LLM calls</span></div></div><div class="workflow-diagram"><pre class="mermaid">graph LR
+  A[Customer Payload] --> B[AI Agent + Code-Mode]
+  B --> C[Onboarding Report]</pre></div></div>
+<div class="workflow-card"><div><div class="workflow-number">02</div><h3>MCP Filesystem</h3><div class="workflow-status"><span class="status-dot"></span> Complete</div><div class="desc">Real file operations through Model Context Protocol in a sandboxed environment. Proves MCP tool integration works inside code-mode.</div><div class="workflow-metrics"><span class="metric">14 tools registered</span><span class="metric">MCP in sandbox</span></div></div><div class="workflow-diagram"><pre class="mermaid">graph LR
+  A[Webhook] --> B[AI Agent]
+  B --> C[Code-Mode + MCP]
+  C --> D[File Ops]</pre></div></div>
+<div class="workflow-card"><div><div class="workflow-number">03</div><h3>Multi-Agent Dispatch</h3><div class="workflow-status"><span class="status-dot"></span> Complete</div><div class="desc">Classification, response, and quality check in a single execution. Replaces a 16-node traditional workflow with 3 nodes.</div><div class="workflow-metrics"><span class="metric">81% fewer nodes</span><span class="metric">4 LLM calls to 1</span></div></div><div class="workflow-diagram"><pre class="mermaid">graph LR
+  A[Request] --> B[AI Agent]
+  B --> C[Classify + Respond + QC]</pre></div></div>
+<div class="workflow-card"><div><div class="workflow-number">04</div><h3>Dev Loop</h3><div class="workflow-status"><span class="status-dot"></span> Complete</div><div class="desc">Full workflow lifecycle in a single API call: create, activate, and verify a workflow. Proves end-to-end authoring automation.</div><div class="workflow-metrics"><span class="metric">11.5s full cycle</span><span class="metric">$0.05 per run</span></div></div><div class="workflow-diagram"><pre class="mermaid">graph LR
+  A["POST /dev-loop"] --> B[AI Agent]
+  B --> C[n8n API Tool]
+  C --> D[Create + Activate]</pre></div></div>
+<div class="workflow-card"><div><div class="workflow-number">05</div><h3>E2E Sibling Tools</h3><div class="workflow-status"><span class="status-dot"></span> Complete</div><div class="desc">Zero-configuration tool discovery between n8n nodes. Code-mode automatically finds and invokes sibling tools on the canvas.</div><div class="workflow-metrics"><span class="metric">Zero-config discovery</span><span class="metric">8/8 criteria pass</span></div></div><div class="workflow-diagram"><pre class="mermaid">graph LR
+  A[Webhook] --> B[AI Agent]
+  B --> C[Calculator]
+  B --> D[Code-Mode]</pre></div></div>
+</div></section>
+<section id="packages"><div class="section-label"><span class="dot dot-accent"></span> Published</div><div class="section-title">npm packages</div><div style="border-radius:var(--radius);overflow:hidden"><table class="packages-table"><thead><tr><th>Package</th><th>Version</th><th>Description</th></tr></thead><tbody><tr><td><a href="https://www.npmjs.com/package/n8n-nodes-utcp-codemode">n8n-nodes-utcp-codemode</a></td><td><span class="pkg-version">2.1.0</span></td><td>n8n community node</td></tr><tr><td><a href="https://www.npmjs.com/package/code-mode-tools">code-mode-tools</a></td><td><span class="pkg-version">0.2.0</span></td><td>CLI + MCP server</td></tr><tr><td><a href="https://www.npmjs.com/package/n8nac-tools">n8nac-tools</a></td><td><span class="pkg-version">1.0.0</span></td><td>n8nac CLI wrapper</td></tr></tbody></table></div></section>
+<section id="links"><div class="section-label"><span class="dot dot-green"></span> Links</div><div class="section-title">Get started</div><div class="links-grid"><a href="https://github.com/mj-deving/code-mode" class="link-card"><div class="link-card-title">GitHub Repository</div><div class="link-card-desc">Source code, workflows, and documentation</div></a><a href="../calculator/index.html" class="link-card"><div class="link-card-title">Token Calculator</div><div class="link-card-desc">Estimate your savings with code-mode</div></a><a href="https://www.npmjs.com/package/n8n-nodes-utcp-codemode" class="link-card"><div class="link-card-title">npm Packages</div><div class="link-card-desc">Install code-mode-tools and n8nac-tools</div></a></div></section>
+</div>
+<footer>Built by <a href="https://github.com/mj-deving">@mj-deving</a></footer>
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({startOnLoad:true,theme:'dark',themeVariables:{darkMode:true,background:'#161b22',primaryColor:'#1c2333',primaryTextColor:'#e6edf3',primaryBorderColor:'rgba(255,255,255,0.12)',lineColor:'#22d3ee',secondaryColor:'#1c2333',tertiaryColor:'#161b22',fontFamily:'Geist,system-ui,sans-serif',fontSize:'13px',nodeBorder:'rgba(34,211,238,0.3)',mainBkg:'#1c2333',nodeTextColor:'#e6edf3',edgeLabelBackground:'#161b22'}});
+</script>
+</body>
+</html>

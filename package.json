@@ -1,0 +1,19 @@
+{
+  "name": "code-mode-proving-ground",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Code-First n8n Proving Ground — n8nac + code-mode lifecycle thesis with 5 proven workflows",
+  "scripts": {
+    "check-secrets": "bash scripts/check-secrets.sh",
+    "check-secrets:staged": "bash scripts/check-secrets.sh --staged",
+    "check-secrets:strict": "bash scripts/check-secrets.sh --strict",
+    "check-exec": "bash scripts/n8n-check.sh",
+    "new-workflow": "bash scripts/new-workflow.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mj-deving/code-mode.git"
+  },
+  "author": "Marius J <mj-deving>",
+  "license": "MIT"
+}

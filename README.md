@@ -1,5 +1,10 @@
 # Code-First n8n
 
+![n8n](https://img.shields.io/badge/n8n-2.11.2-orange.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Workflows](https://img.shields.io/badge/workflows-5%2F5%20complete-brightgreen.svg)
+![Token Savings](https://img.shields.io/badge/token%20savings-96%25-blue.svg)
+
 **96% fewer tokens. 80% faster. 86% fewer nodes. Make n8n fully code-first -- from authoring through production.**
 
 This repo proves that two tools together cover the entire n8n workflow lifecycle without clicking:
