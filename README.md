@@ -183,7 +183,23 @@ This scaffolds a complete workflow directory from [template/](template/) with RE
 | [Playbook: Lifecycle](playbook/lifecycle.md) | Portable framing of the code-first n8n story |
 | [Playbook: Benchmarks](playbook/benchmarks.md) | Token savings data, methodology, cost projections |
 | [Playbook: Architecture](playbook/architecture.md) | How @code-mode/core, n8n node, and MCP server fit together |
-| [CLAUDE.md](CLAUDE.md) | Build commands, architecture, workflow development guide |
+## Contributing
+
+```bash
+# Build n8n community node (monorepo)
+cd n8n-nodes-utcp-codemode && npm run build && npm test
+
+# Scaffold a new workflow
+./scripts/new-workflow.sh agents/06-slack-triage "Slack Message Triage"
+
+# Check for secrets before committing
+npm run check-secrets
+
+# Check n8n execution results
+npm run check-exec -- <workflowId>
+```
+
+AI agents: see [AGENTS.md](AGENTS.md) for the n8nac workflow protocol.
 
 ## LLM Compatibility
 
@@ -195,7 +211,7 @@ This scaffolds a complete workflow directory from [template/](template/) with RE
 
 ## License
 
-MPL-2.0
+MIT
 
 ---
 
