@@ -1,30 +1,31 @@
 # Workflow Template System
 
-> Hybrid approach: develop in monorepo, graduate proven workflows to standalone repos.
+> Develop workflows in the monorepo, distribute via n8n-native sharing. Packages graduate to standalone repos.
 
 ## Philosophy
 
-Two observations drive this design:
-
 1. **During development**, a monorepo is better — shared tooling, shared context, one git checkout
-2. **For distribution**, standalone repos are better — discoverable, forkable, professional
-
-The template system supports both phases.
+2. **For distribution**, workflows and packages have different paths:
+   - **Workflows** stay in the proving ground and distribute via n8n community templates, JSON export, and blog posts. A repo with one JSON file and a README is overhead for no benefit — people consume n8n workflows by importing JSON, not cloning repos.
+   - **Packages** (npm libraries like `code-mode-tools`, `n8nac-tools`) graduate to standalone repos — they need independent versioning, npm publishing, and their own issue trackers.
 
 ## Workflow Lifecycle
 
 ```
-┌─────────┐    ┌─────────┐    ┌──────────┐    ┌────────────┐
-│ Scaffold │ →  │  Prove  │ →  │ Graduate │ →  │ Distribute │
-│ (here)   │    │ (here)  │    │ (extract)│    │ (own repo) │
-└─────────┘    └─────────┘    └──────────┘    └────────────┘
-  monorepo       monorepo      standalone       standalone
+┌─────────┐    ┌─────────┐    ┌────────────┐
+│ Scaffold │ →  │  Prove  │ →  │ Distribute │
+│ (here)   │    │ (here)  │    │ (from here)│
+└─────────┘    └─────────┘    └────────────┘
+  monorepo       monorepo       monorepo
 ```
 
 1. **Scaffold** — `./scripts/new-workflow.sh agents/06-slack-triage "Slack Triage"`
 2. **Prove** — build, test, benchmark, document in the monorepo
-3. **Graduate** — when a workflow is proven and polished, extract its directory to a standalone repo
-4. **Distribute** — the standalone repo follows [n8n-workflow-template](https://github.com/jeremylongshore/n8n-workflow-template) conventions for discoverability
+3. **Distribute** — export workflow.json, submit to n8n community, include in blog posts
+
+### Package Lifecycle (separate)
+
+Packages like `code-mode-tools` and `n8nac-tools` follow a different path: develop in their own repo, publish to npm, reference from the proving ground.
 
 ## Directory Structure
 
@@ -90,12 +91,11 @@ Every workflow README must have:
 | **What This Proves** | Yes | Lifecycle layer + thesis claim |
 | **Status** | Yes | Checklist of completion criteria |
 
-## Graduation Criteria
+## Distribution Readiness
 
-A workflow is ready to graduate to its own repo when:
+A workflow is ready to distribute when:
 
 - [ ] All status checklist items are complete
-- [ ] workflow.ts exists and can be pushed via n8nac
 - [ ] workflow.json exists and can be imported via n8n UI
 - [ ] Test payloads in test.json all pass
 - [ ] README has all required sections filled in
