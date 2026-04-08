@@ -52,11 +52,11 @@ Each POC proves one layer of the thesis with real data:
 
 | POC | What It Proves | Status |
 |---|---|---|
-| [01 — Customer Onboarding](workflows/01-customer-onboarding/) | Runtime: 96% token savings | Benchmarked |
-| [02 — MCP Filesystem](workflows/02-mcp-filesystem/) | Real file operations through MCP in sandbox | Verified |
-| [03 — Multi-Agent Dispatch](workflows/03-multi-agent-dispatch/) | 16-node workflow → 3 nodes (81% reduction) | Implemented |
-| [04 — Dev Loop](workflows/agents/04-dev-loop/) | Full lifecycle: n8nac → code-mode end-to-end | **E2E Proven** |
-| [05 — E2E Sibling Tools](workflows/05-e2e-sibling-tools/) | Zero-config tool discovery + execution | **8/8 pass** |
+| [01 — Customer Onboarding](workflows/01-customer-onboarding/) | Runtime: 96% token savings | **Complete** — [benchmarked](workflows/01-customer-onboarding/benchmark.md) |
+| [02 — MCP Filesystem](workflows/02-mcp-filesystem/) | Real file operations through MCP in sandbox | **Complete** — [verified](workflows/02-mcp-filesystem/benchmark.md) |
+| [03 — Multi-Agent Dispatch](workflows/03-multi-agent-dispatch/) | 16-node workflow → 3 nodes (81% reduction) | **Complete** — [implemented](workflows/03-multi-agent-dispatch/benchmark.md) |
+| [04 — Dev Loop](workflows/agents/04-dev-loop/) | Full lifecycle in one prompt (11.5s, $0.05) | **Complete** — [E2E proven](workflows/agents/04-dev-loop/benchmark.md) |
+| [05 — E2E Sibling Tools](workflows/05-e2e-sibling-tools/) | Zero-config tool discovery + execution | **Complete** — [8/8 pass](workflows/05-e2e-sibling-tools/benchmark.md) |
 
 ## Repo Map
 
