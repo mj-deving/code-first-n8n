@@ -1,0 +1,114 @@
+{
+  "id": "hHynFG7HpDYCYiSw",
+  "name": "Multi-Agent Dispatch (Code-Mode)",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "multi-agent-dispatch",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "f1a2b3c4-d5e6-4f78-9012-abcdef123456",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "a9b8c7d6-e5f4-4321-fedc-ba9876543210"
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-haiku-4-5",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "id": "c3d4e5f6-a7b8-4c9d-0e1f-234567890abc",
+      "name": "Haiku via OpenRouter",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        460,
+        200
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "mOL6UoYXfgKf6RZh",
+          "name": "OpenRouter"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ `Customer request:\n${JSON.stringify($json.body || $json, null, 2)}` }}",
+        "options": {
+          "systemMessage": "You are a multi-agent support dispatcher. Handle customer requests in one pass:\n\n## Step 1: Classify\nDetermine the category: tech, sales, faq, or general.\n\n## Step 2: Respond as specialist\nBased on the category, respond with domain expertise:\n- **tech**: Provide technical troubleshooting steps, system requirements, compatibility info\n- **sales**: Provide pricing, plans, upgrade paths, ROI calculations\n- **faq**: Provide clear answers from common knowledge base topics\n- **general**: Provide a helpful general response\n\n## Step 3: Quality check\nBefore responding, verify:\n- Response addresses the actual question\n- Tone is professional and helpful\n- If urgent (mentions \"down\", \"broken\", \"emergency\"), flag as URGENT\n\n## Output format\nRespond with JSON:\n{\n  \"category\": \"tech|sales|faq|general\",\n  \"urgent\": true|false,\n  \"response\": \"Your specialist response here\",\n  \"confidence\": 0.0-1.0\n}",
+          "maxIterations": 1
+        }
+      },
+      "id": "e5f6a7b8-c9d0-4e1f-2345-67890abcdef0",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        680,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Haiku via OpenRouter": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-08T07:19:57.409Z",
+      "createdAt": "2026-04-08T07:19:57.409Z",
+      "role": "workflow:owner",
+      "workflowId": "hHynFG7HpDYCYiSw",
+      "projectId": "aCXUToL316T52fqN",
+      "project": {
+        "updatedAt": "2026-03-11T07:37:14.647Z",
+        "createdAt": "2026-03-11T07:16:46.408Z",
+        "id": "aCXUToL316T52fqN",
+        "name": "Marius  J <mariusclaude@proton.me>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "ef4354d8-75df-4047-9d6d-d8972c1eab41"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
