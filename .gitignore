@@ -8,8 +8,20 @@ node_modules/
 dist/
 *.tgz
 
+# AI session artifacts (not for consumers)
+.ai/
+.sessions/
+.codex/
+.mcp.json
+
 # PRD work directories (transient)
 MEMORY/WORK/
 
 # Plans (transient)
 Plans/
+
+# n8nac runtime config (has instance-specific paths)
+n8nac-config.json
+
+# Stray artifacts
+null/
