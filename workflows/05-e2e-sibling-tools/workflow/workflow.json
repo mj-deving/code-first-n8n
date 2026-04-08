@@ -1,0 +1,333 @@
+{
+  "id": "pxCt6Wv92qqUbznT",
+  "name": "WF11 - E2E Sibling Tools Test",
+  "active": true,
+  "nodes": [
+    {
+      "id": "webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "e2e-sibling-test",
+      "parameters": {
+        "path": "e2e-sibling-test",
+        "httpMethod": "POST",
+        "responseMode": "lastNode"
+      }
+    },
+    {
+      "id": "agent",
+      "name": "E2E Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        300
+      ],
+      "parameters": {
+        "text": "={{ $json.body.prompt }}",
+        "options": {
+          "systemMessage": "You are a test agent with ONE tool: execute_code_chain. \nYou MUST call this tool for ANY calculation request. Do NOT try to calculate yourself.\nWhen you call execute_code_chain, provide a TypeScript code string.\n\nThe sandbox has sibling tools available. To add numbers, use:\nconst result = sibling.calculator({ a: 42, b: 58 });\nreturn result;\n\nIMPORTANT: You must call execute_code_chain tool with the code parameter. Do not respond without calling the tool first."
+        },
+        "promptType": "define"
+      }
+    },
+    {
+      "id": "llm",
+      "name": "Claude via OpenRouter",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        300,
+        520
+      ],
+      "parameters": {
+        "model": "anthropic/claude-sonnet-4",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "credentials": {
+        "openRouterApi": {
+          "id": "G7NawpVKN9CxuS0T",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "id": "calculator",
+      "name": "Calculator Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        700,
+        520
+      ],
+      "parameters": {
+        "name": "calculator",
+        "description": "Adds two numbers a and b together. Input: JSON with a and b fields (numbers). Returns their sum.",
+        "language": "javaScript",
+        "jsCode": "const input = typeof query === \"string\" ? JSON.parse(query) : query; return JSON.stringify({ sum: (input.a || 0) + (input.b || 0) });",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\": \"object\", \"properties\": {\"a\": {\"type\": \"number\", \"description\": \"First number\"}, \"b\": {\"type\": \"number\", \"description\": \"Second number\"}}, \"required\": [\"a\", \"b\"]}"
+      }
+    },
+    {
+      "id": "codemode",
+      "name": "Code-Mode Tool",
+      "type": "n8n-nodes-utcp-codemode.codeModeTool",
+      "typeVersion": 1,
+      "position": [
+        500,
+        520
+      ],
+      "parameters": {
+        "autoRegisterSiblings": true,
+        "toolSources": "[]",
+        "timeout": 30000,
+        "memoryLimit": 128
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "E2E Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Code-Mode Tool",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code-Mode Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "E2E Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude via OpenRouter": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "E2E Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-21T19:12:37.138Z",
+      "createdAt": "2026-03-21T19:12:37.138Z",
+      "role": "workflow:owner",
+      "workflowId": "pxCt6Wv92qqUbznT",
+      "projectId": "aCXUToL316T52fqN",
+      "project": {
+        "updatedAt": "2026-03-11T07:37:14.647Z",
+        "createdAt": "2026-03-11T07:16:46.408Z",
+        "id": "aCXUToL316T52fqN",
+        "name": "Marius  J <mariusclaude@proton.me>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "ef4354d8-75df-4047-9d6d-d8972c1eab41"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-04-07T08:16:25.850Z",
+    "createdAt": "2026-04-07T08:16:25.850Z",
+    "versionId": "80900e62-dff3-46fa-b8b3-2a12e3ca63db",
+    "workflowId": "pxCt6Wv92qqUbznT",
+    "nodes": [
+      {
+        "id": "webhook",
+        "name": "Webhook Trigger",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          0,
+          300
+        ],
+        "webhookId": "e2e-sibling-test",
+        "parameters": {
+          "path": "e2e-sibling-test",
+          "httpMethod": "POST",
+          "responseMode": "lastNode"
+        }
+      },
+      {
+        "id": "agent",
+        "name": "E2E Agent",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2.1,
+        "position": [
+          300,
+          300
+        ],
+        "parameters": {
+          "text": "={{ $json.body.prompt }}",
+          "options": {
+            "systemMessage": "You are a test agent with ONE tool: execute_code_chain. \nYou MUST call this tool for ANY calculation request. Do NOT try to calculate yourself.\nWhen you call execute_code_chain, provide a TypeScript code string.\n\nThe sandbox has sibling tools available. To add numbers, use:\nconst result = sibling.calculator({ a: 42, b: 58 });\nreturn result;\n\nIMPORTANT: You must call execute_code_chain tool with the code parameter. Do not respond without calling the tool first."
+          },
+          "promptType": "define"
+        }
+      },
+      {
+        "id": "llm",
+        "name": "Claude via OpenRouter",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "typeVersion": 1,
+        "position": [
+          300,
+          520
+        ],
+        "parameters": {
+          "model": "anthropic/claude-sonnet-4",
+          "options": {
+            "temperature": 0.1
+          }
+        },
+        "credentials": {
+          "openRouterApi": {
+            "id": "G7NawpVKN9CxuS0T",
+            "name": "OpenRouter API"
+          }
+        }
+      },
+      {
+        "id": "calculator",
+        "name": "Calculator Tool",
+        "type": "@n8n/n8n-nodes-langchain.toolCode",
+        "typeVersion": 1.3,
+        "position": [
+          700,
+          520
+        ],
+        "parameters": {
+          "name": "calculator",
+          "description": "Adds two numbers a and b together. Input: JSON with a and b fields (numbers). Returns their sum.",
+          "language": "javaScript",
+          "jsCode": "const input = typeof query === \"string\" ? JSON.parse(query) : query; return JSON.stringify({ sum: (input.a || 0) + (input.b || 0) });",
+          "specifyInputSchema": true,
+          "schemaType": "manual",
+          "inputSchema": "{\"type\": \"object\", \"properties\": {\"a\": {\"type\": \"number\", \"description\": \"First number\"}, \"b\": {\"type\": \"number\", \"description\": \"Second number\"}}, \"required\": [\"a\", \"b\"]}"
+        }
+      },
+      {
+        "id": "codemode",
+        "name": "Code-Mode Tool",
+        "type": "n8n-nodes-utcp-codemode.codeModeTool",
+        "typeVersion": 1,
+        "position": [
+          500,
+          520
+        ],
+        "parameters": {
+          "autoRegisterSiblings": true,
+          "toolSources": "[]",
+          "timeout": 30000,
+          "memoryLimit": 128
+        }
+      }
+    ],
+    "connections": {
+      "Webhook Trigger": {
+        "main": [
+          [
+            {
+              "node": "E2E Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calculator Tool": {
+        "ai_tool": [
+          [
+            {
+              "node": "Code-Mode Tool",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code-Mode Tool": {
+        "ai_tool": [
+          [
+            {
+              "node": "E2E Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Claude via OpenRouter": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "E2E Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Marius  J",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-04-07T08:16:25.897Z",
+        "id": 85,
+        "workflowId": "pxCt6Wv92qqUbznT",
+        "versionId": "80900e62-dff3-46fa-b8b3-2a12e3ca63db",
+        "event": "activated",
+        "userId": "ef4354d8-75df-4047-9d6d-d8972c1eab41"
+      },
+      {
+        "createdAt": "2026-04-07T08:16:25.881Z",
+        "id": 84,
+        "workflowId": "pxCt6Wv92qqUbznT",
+        "versionId": "80900e62-dff3-46fa-b8b3-2a12e3ca63db",
+        "event": "deactivated",
+        "userId": "ef4354d8-75df-4047-9d6d-d8972c1eab41"
+      }
+    ]
+  }
+}

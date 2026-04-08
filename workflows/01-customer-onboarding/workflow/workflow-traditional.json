@@ -1,0 +1,516 @@
+{
+  "id": "zQ4KCniPiiOS3EEG",
+  "name": "WF8 - Benchmark Traditional (5 Tools)",
+  "active": true,
+  "nodes": [
+    {
+      "id": "aa000001-0001-4001-a001-000000000001",
+      "webhookId": "bb000001-0001-4001-a001-000000000001",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "benchmark-traditional",
+        "responseMode": "lastNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "aa000001-0001-4001-a001-000000000002",
+      "name": "Benchmark Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        300,
+        300
+      ],
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ \"Process this customer for onboarding. Use ALL 5 tools in order: 1) validate_email 2) classify_company 3) score_customer 4) generate_message 5) format_report. You MUST call each tool exactly once. Customer data: \" + JSON.stringify($json.body) }}",
+        "options": {
+          "systemMessage": "You are a customer onboarding assistant. You MUST use all 5 tools in sequence to fully process each customer. Call them one after another: validate_email first, then classify_company, then score_customer, then generate_message, then format_report. Pass the results from earlier tools to later ones.",
+          "maxIterations": 15
+        }
+      }
+    },
+    {
+      "id": "aa000001-0001-4001-a001-000000000003",
+      "name": "Gemini Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        300,
+        550
+      ],
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "FVE8T8mYCgIRpSyv",
+          "name": "Google Gemini"
+        }
+      }
+    },
+    {
+      "id": "aa000001-0001-4001-a001-000000000004",
+      "name": "Validate Email",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        500,
+        550
+      ],
+      "parameters": {
+        "name": "validate_email",
+        "description": "Validates an email address and extracts its parts. Input: JSON with email field.",
+        "language": "javaScript",
+        "jsCode": "const input = JSON.parse(query); const email = input.email || \"\"; const parts = email.split(\"@\"); const valid = parts.length === 2 && parts[1].includes(\".\"); const domain = valid ? parts[1] : \"invalid\"; const username = valid ? parts[0] : \"invalid\"; return JSON.stringify({ valid, email, username, domain, provider: domain.split(\".\")[0] });",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\": \"object\", \"properties\": {\"email\": {\"type\": \"string\", \"description\": \"Email address to validate\"}}, \"required\": [\"email\"]}"
+      }
+    },
+    {
+      "id": "aa000001-0001-4001-a001-000000000005",
+      "name": "Classify Company",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        700,
+        550
+      ],
+      "parameters": {
+        "name": "classify_company",
+        "description": "Classifies a company by domain and name. Input: JSON with domain and company fields.",
+        "language": "javaScript",
+        "jsCode": "const input = JSON.parse(query); const domain = (input.domain || \"\").toLowerCase(); const company = (input.company || \"\").toLowerCase(); const techDomains = [\"google\", \"microsoft\", \"apple\", \"meta\", \"amazon\", \"github\", \"gitlab\"]; const isTech = techDomains.some(t => domain.includes(t) || company.includes(t)); const isEnterprise = domain.endsWith(\".com\") && company.length > 3; const industry = isTech ? \"technology\" : domain.endsWith(\".edu\") ? \"education\" : domain.endsWith(\".gov\") ? \"government\" : \"general\"; const size = isEnterprise ? \"enterprise\" : \"smb\"; return JSON.stringify({ domain, company: input.company, industry, size, isTech });",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\": \"object\", \"properties\": {\"domain\": {\"type\": \"string\", \"description\": \"Email domain\"}, \"company\": {\"type\": \"string\", \"description\": \"Company name\"}}, \"required\": [\"domain\", \"company\"]}"
+      }
+    },
+    {
+      "id": "aa000001-0001-4001-a001-000000000006",
+      "name": "Score Customer",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        500,
+        750
+      ],
+      "parameters": {
+        "name": "score_customer",
+        "description": "Scores a customer into a tier based on company classification. Input: JSON with size, industry, isTech fields.",
+        "language": "javaScript",
+        "jsCode": "const input = JSON.parse(query); let score = 50; if (input.size === \"enterprise\") score += 30; if (input.isTech) score += 15; if (input.industry === \"technology\") score += 10; if (input.industry === \"government\") score += 5; const tier = score >= 80 ? \"platinum\" : score >= 60 ? \"gold\" : score >= 40 ? \"silver\" : \"bronze\"; const monthlyBudget = tier === \"platinum\" ? 199 : tier === \"gold\" ? 79 : tier === \"silver\" ? 29 : 9; return JSON.stringify({ score, tier, monthlyBudget, recommendedPlan: tier === \"platinum\" ? \"Enterprise\" : tier === \"gold\" ? \"Professional\" : tier === \"silver\" ? \"Starter\" : \"Free\" });",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\": \"object\", \"properties\": {\"size\": {\"type\": \"string\", \"description\": \"Company size\"}, \"industry\": {\"type\": \"string\", \"description\": \"Industry\"}, \"isTech\": {\"type\": \"boolean\", \"description\": \"Is tech company\"}}, \"required\": [\"size\", \"industry\", \"isTech\"]}"
+      }
+    },
+    {
+      "id": "aa000001-0001-4001-a001-000000000007",
+      "name": "Generate Message",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        700,
+        750
+      ],
+      "parameters": {
+        "name": "generate_message",
+        "description": "Generates a personalized onboarding message. Input: JSON with name, tier, recommendedPlan, industry fields.",
+        "language": "javaScript",
+        "jsCode": "const input = JSON.parse(query); const greetings = { platinum: \"We are thrilled to welcome\", gold: \"Welcome aboard\", silver: \"Great to have you\", bronze: \"Welcome\" }; const greeting = greetings[input.tier] || \"Welcome\"; const msg = greeting + \" \" + input.name + \"! Based on your \" + input.industry + \" background, we recommend our \" + input.recommendedPlan + \" plan. As a \" + input.tier + \" tier customer, you will receive priority support and dedicated onboarding assistance.\"; return JSON.stringify({ message: msg, tier: input.tier, cta: \"Start your \" + input.recommendedPlan + \" trial now\" });",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\", \"description\": \"Customer name\"}, \"tier\": {\"type\": \"string\", \"description\": \"Customer tier\"}, \"recommendedPlan\": {\"type\": \"string\", \"description\": \"Recommended plan\"}, \"industry\": {\"type\": \"string\", \"description\": \"Industry\"}}, \"required\": [\"name\", \"tier\", \"recommendedPlan\", \"industry\"]}"
+      }
+    },
+    {
+      "id": "aa000001-0001-4001-a001-000000000008",
+      "name": "Format Report",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        600,
+        950
+      ],
+      "parameters": {
+        "name": "format_report",
+        "description": "Formats a final customer onboarding report. Input: JSON with all enrichment data: name, email, company, tier, score, message, recommendedPlan.",
+        "language": "javaScript",
+        "jsCode": "const input = JSON.parse(query); const report = { timestamp: new Date().toISOString(), customer: { name: input.name, email: input.email, company: input.company }, enrichment: { tier: input.tier, score: input.score, recommendedPlan: input.recommendedPlan, industry: input.industry }, onboarding: { message: input.message, cta: input.cta }, status: \"ready_for_outreach\" }; return JSON.stringify(report);",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}, \"email\": {\"type\": \"string\"}, \"company\": {\"type\": \"string\"}, \"tier\": {\"type\": \"string\"}, \"score\": {\"type\": \"number\"}, \"message\": {\"type\": \"string\"}, \"cta\": {\"type\": \"string\"}, \"recommendedPlan\": {\"type\": \"string\"}, \"industry\": {\"type\": \"string\"}}, \"required\": [\"name\", \"email\", \"company\", \"tier\", \"score\", \"message\", \"recommendedPlan\"]}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Benchmark Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Benchmark Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "Benchmark Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Company": {
+      "ai_tool": [
+        [
+          {
+            "node": "Benchmark Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Customer": {
+      "ai_tool": [
+        [
+          {
+            "node": "Benchmark Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Message": {
+      "ai_tool": [
+        [
+          {
+            "node": "Benchmark Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Report": {
+      "ai_tool": [
+        [
+          {
+            "node": "Benchmark Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-20T18:23:05.708Z",
+      "createdAt": "2026-03-20T18:23:05.708Z",
+      "role": "workflow:owner",
+      "workflowId": "zQ4KCniPiiOS3EEG",
+      "projectId": "aCXUToL316T52fqN",
+      "project": {
+        "updatedAt": "2026-03-11T07:37:14.647Z",
+        "createdAt": "2026-03-11T07:16:46.408Z",
+        "id": "aCXUToL316T52fqN",
+        "name": "Marius  J <mariusclaude@proton.me>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "ef4354d8-75df-4047-9d6d-d8972c1eab41"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-20T18:23:05.708Z",
+    "createdAt": "2026-03-20T18:23:05.708Z",
+    "versionId": "761c3874-314a-4908-af5d-3ca0cf57ed11",
+    "workflowId": "zQ4KCniPiiOS3EEG",
+    "nodes": [
+      {
+        "id": "aa000001-0001-4001-a001-000000000001",
+        "webhookId": "bb000001-0001-4001-a001-000000000001",
+        "name": "Webhook Trigger",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          300
+        ],
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "benchmark-traditional",
+          "responseMode": "lastNode",
+          "options": {}
+        }
+      },
+      {
+        "id": "aa000001-0001-4001-a001-000000000002",
+        "name": "Benchmark Agent",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          300,
+          300
+        ],
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ \"Process this customer for onboarding. Use ALL 5 tools in order: 1) validate_email 2) classify_company 3) score_customer 4) generate_message 5) format_report. You MUST call each tool exactly once. Customer data: \" + JSON.stringify($json.body) }}",
+          "options": {
+            "systemMessage": "You are a customer onboarding assistant. You MUST use all 5 tools in sequence to fully process each customer. Call them one after another: validate_email first, then classify_company, then score_customer, then generate_message, then format_report. Pass the results from earlier tools to later ones.",
+            "maxIterations": 15
+          }
+        }
+      },
+      {
+        "id": "aa000001-0001-4001-a001-000000000003",
+        "name": "Gemini Model",
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          300,
+          550
+        ],
+        "parameters": {
+          "modelName": "models/gemini-2.0-flash",
+          "options": {
+            "temperature": 0.1
+          }
+        },
+        "credentials": {
+          "googlePalmApi": {
+            "id": "FVE8T8mYCgIRpSyv",
+            "name": "Google Gemini"
+          }
+        }
+      },
+      {
+        "id": "aa000001-0001-4001-a001-000000000004",
+        "name": "Validate Email",
+        "type": "@n8n/n8n-nodes-langchain.toolCode",
+        "typeVersion": 1.3,
+        "position": [
+          500,
+          550
+        ],
+        "parameters": {
+          "name": "validate_email",
+          "description": "Validates an email address and extracts its parts. Input: JSON with email field.",
+          "language": "javaScript",
+          "jsCode": "const input = JSON.parse(query); const email = input.email || \"\"; const parts = email.split(\"@\"); const valid = parts.length === 2 && parts[1].includes(\".\"); const domain = valid ? parts[1] : \"invalid\"; const username = valid ? parts[0] : \"invalid\"; return JSON.stringify({ valid, email, username, domain, provider: domain.split(\".\")[0] });",
+          "specifyInputSchema": true,
+          "schemaType": "manual",
+          "inputSchema": "{\"type\": \"object\", \"properties\": {\"email\": {\"type\": \"string\", \"description\": \"Email address to validate\"}}, \"required\": [\"email\"]}"
+        }
+      },
+      {
+        "id": "aa000001-0001-4001-a001-000000000005",
+        "name": "Classify Company",
+        "type": "@n8n/n8n-nodes-langchain.toolCode",
+        "typeVersion": 1.3,
+        "position": [
+          700,
+          550
+        ],
+        "parameters": {
+          "name": "classify_company",
+          "description": "Classifies a company by domain and name. Input: JSON with domain and company fields.",
+          "language": "javaScript",
+          "jsCode": "const input = JSON.parse(query); const domain = (input.domain || \"\").toLowerCase(); const company = (input.company || \"\").toLowerCase(); const techDomains = [\"google\", \"microsoft\", \"apple\", \"meta\", \"amazon\", \"github\", \"gitlab\"]; const isTech = techDomains.some(t => domain.includes(t) || company.includes(t)); const isEnterprise = domain.endsWith(\".com\") && company.length > 3; const industry = isTech ? \"technology\" : domain.endsWith(\".edu\") ? \"education\" : domain.endsWith(\".gov\") ? \"government\" : \"general\"; const size = isEnterprise ? \"enterprise\" : \"smb\"; return JSON.stringify({ domain, company: input.company, industry, size, isTech });",
+          "specifyInputSchema": true,
+          "schemaType": "manual",
+          "inputSchema": "{\"type\": \"object\", \"properties\": {\"domain\": {\"type\": \"string\", \"description\": \"Email domain\"}, \"company\": {\"type\": \"string\", \"description\": \"Company name\"}}, \"required\": [\"domain\", \"company\"]}"
+        }
+      },
+      {
+        "id": "aa000001-0001-4001-a001-000000000006",
+        "name": "Score Customer",
+        "type": "@n8n/n8n-nodes-langchain.toolCode",
+        "typeVersion": 1.3,
+        "position": [
+          500,
+          750
+        ],
+        "parameters": {
+          "name": "score_customer",
+          "description": "Scores a customer into a tier based on company classification. Input: JSON with size, industry, isTech fields.",
+          "language": "javaScript",
+          "jsCode": "const input = JSON.parse(query); let score = 50; if (input.size === \"enterprise\") score += 30; if (input.isTech) score += 15; if (input.industry === \"technology\") score += 10; if (input.industry === \"government\") score += 5; const tier = score >= 80 ? \"platinum\" : score >= 60 ? \"gold\" : score >= 40 ? \"silver\" : \"bronze\"; const monthlyBudget = tier === \"platinum\" ? 199 : tier === \"gold\" ? 79 : tier === \"silver\" ? 29 : 9; return JSON.stringify({ score, tier, monthlyBudget, recommendedPlan: tier === \"platinum\" ? \"Enterprise\" : tier === \"gold\" ? \"Professional\" : tier === \"silver\" ? \"Starter\" : \"Free\" });",
+          "specifyInputSchema": true,
+          "schemaType": "manual",
+          "inputSchema": "{\"type\": \"object\", \"properties\": {\"size\": {\"type\": \"string\", \"description\": \"Company size\"}, \"industry\": {\"type\": \"string\", \"description\": \"Industry\"}, \"isTech\": {\"type\": \"boolean\", \"description\": \"Is tech company\"}}, \"required\": [\"size\", \"industry\", \"isTech\"]}"
+        }
+      },
+      {
+        "id": "aa000001-0001-4001-a001-000000000007",
+        "name": "Generate Message",
+        "type": "@n8n/n8n-nodes-langchain.toolCode",
+        "typeVersion": 1.3,
+        "position": [
+          700,
+          750
+        ],
+        "parameters": {
+          "name": "generate_message",
+          "description": "Generates a personalized onboarding message. Input: JSON with name, tier, recommendedPlan, industry fields.",
+          "language": "javaScript",
+          "jsCode": "const input = JSON.parse(query); const greetings = { platinum: \"We are thrilled to welcome\", gold: \"Welcome aboard\", silver: \"Great to have you\", bronze: \"Welcome\" }; const greeting = greetings[input.tier] || \"Welcome\"; const msg = greeting + \" \" + input.name + \"! Based on your \" + input.industry + \" background, we recommend our \" + input.recommendedPlan + \" plan. As a \" + input.tier + \" tier customer, you will receive priority support and dedicated onboarding assistance.\"; return JSON.stringify({ message: msg, tier: input.tier, cta: \"Start your \" + input.recommendedPlan + \" trial now\" });",
+          "specifyInputSchema": true,
+          "schemaType": "manual",
+          "inputSchema": "{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\", \"description\": \"Customer name\"}, \"tier\": {\"type\": \"string\", \"description\": \"Customer tier\"}, \"recommendedPlan\": {\"type\": \"string\", \"description\": \"Recommended plan\"}, \"industry\": {\"type\": \"string\", \"description\": \"Industry\"}}, \"required\": [\"name\", \"tier\", \"recommendedPlan\", \"industry\"]}"
+        }
+      },
+      {
+        "id": "aa000001-0001-4001-a001-000000000008",
+        "name": "Format Report",
+        "type": "@n8n/n8n-nodes-langchain.toolCode",
+        "typeVersion": 1.3,
+        "position": [
+          600,
+          950
+        ],
+        "parameters": {
+          "name": "format_report",
+          "description": "Formats a final customer onboarding report. Input: JSON with all enrichment data: name, email, company, tier, score, message, recommendedPlan.",
+          "language": "javaScript",
+          "jsCode": "const input = JSON.parse(query); const report = { timestamp: new Date().toISOString(), customer: { name: input.name, email: input.email, company: input.company }, enrichment: { tier: input.tier, score: input.score, recommendedPlan: input.recommendedPlan, industry: input.industry }, onboarding: { message: input.message, cta: input.cta }, status: \"ready_for_outreach\" }; return JSON.stringify(report);",
+          "specifyInputSchema": true,
+          "schemaType": "manual",
+          "inputSchema": "{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}, \"email\": {\"type\": \"string\"}, \"company\": {\"type\": \"string\"}, \"tier\": {\"type\": \"string\"}, \"score\": {\"type\": \"number\"}, \"message\": {\"type\": \"string\"}, \"cta\": {\"type\": \"string\"}, \"recommendedPlan\": {\"type\": \"string\"}, \"industry\": {\"type\": \"string\"}}, \"required\": [\"name\", \"email\", \"company\", \"tier\", \"score\", \"message\", \"recommendedPlan\"]}"
+        }
+      }
+    ],
+    "connections": {
+      "Webhook Trigger": {
+        "main": [
+          [
+            {
+              "node": "Benchmark Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gemini Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Benchmark Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validate Email": {
+        "ai_tool": [
+          [
+            {
+              "node": "Benchmark Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Classify Company": {
+        "ai_tool": [
+          [
+            {
+              "node": "Benchmark Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Score Customer": {
+        "ai_tool": [
+          [
+            {
+              "node": "Benchmark Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate Message": {
+        "ai_tool": [
+          [
+            {
+              "node": "Benchmark Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Report": {
+        "ai_tool": [
+          [
+            {
+              "node": "Benchmark Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Marius  J",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-20T18:23:38.704Z",
+        "id": 44,
+        "workflowId": "zQ4KCniPiiOS3EEG",
+        "versionId": "761c3874-314a-4908-af5d-3ca0cf57ed11",
+        "event": "activated",
+        "userId": "ef4354d8-75df-4047-9d6d-d8972c1eab41"
+      }
+    ]
+  }
+}

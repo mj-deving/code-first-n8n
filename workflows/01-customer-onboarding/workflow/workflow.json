@@ -1,0 +1,266 @@
+{
+  "id": "WVeyUVbK32wI6ZGQ",
+  "name": "WF9 - Benchmark Code-Mode (1 Tool)",
+  "active": true,
+  "nodes": [
+    {
+      "id": "bb000001-0001-4001-a001-000000000001",
+      "webhookId": "cc000001-0001-4001-a001-000000000001",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "benchmark-codemode",
+        "responseMode": "lastNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "bb000001-0001-4001-a001-000000000002",
+      "name": "Benchmark Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        300,
+        300
+      ],
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ \"You MUST call the execute_code_chain tool with TypeScript code that processes this customer through a complete 5-step onboarding pipeline. The code must: 1) validate the email and extract domain 2) classify the company by domain/name 3) score customer into a tier (platinum/gold/silver/bronze) 4) generate a personalized onboarding message 5) format a final report with all data. Return the complete report as JSON. Customer data: \" + JSON.stringify($json.body) }}",
+        "options": {
+          "systemMessage": "You are a customer onboarding assistant. You have ONE tool: execute_code_chain. Write a single TypeScript code block that performs ALL 5 steps of customer enrichment (validate email, classify company, score tier, generate message, format report). Do NOT call the tool multiple times — write ALL logic in ONE code block."
+        }
+      }
+    },
+    {
+      "id": "bb000001-0001-4001-a001-000000000003",
+      "name": "Gemini Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        300,
+        550
+      ],
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "FVE8T8mYCgIRpSyv",
+          "name": "Google Gemini"
+        }
+      }
+    },
+    {
+      "id": "bb000001-0001-4001-a001-000000000004",
+      "name": "Code-Mode Tool",
+      "type": "n8n-nodes-utcp-codemode.codeModeTool",
+      "typeVersion": 1,
+      "position": [
+        500,
+        550
+      ],
+      "parameters": {
+        "toolSources": "[]",
+        "timeout": 30000,
+        "memoryLimit": 128
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Benchmark Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Benchmark Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code-Mode Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Benchmark Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-20T18:23:20.680Z",
+      "createdAt": "2026-03-20T18:23:20.680Z",
+      "role": "workflow:owner",
+      "workflowId": "WVeyUVbK32wI6ZGQ",
+      "projectId": "aCXUToL316T52fqN",
+      "project": {
+        "updatedAt": "2026-03-11T07:37:14.647Z",
+        "createdAt": "2026-03-11T07:16:46.408Z",
+        "id": "aCXUToL316T52fqN",
+        "name": "Marius  J <mariusclaude@proton.me>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "ef4354d8-75df-4047-9d6d-d8972c1eab41"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-20T18:23:20.680Z",
+    "createdAt": "2026-03-20T18:23:20.680Z",
+    "versionId": "6075aef2-3740-46e1-99e6-288784303bac",
+    "workflowId": "WVeyUVbK32wI6ZGQ",
+    "nodes": [
+      {
+        "id": "bb000001-0001-4001-a001-000000000001",
+        "webhookId": "cc000001-0001-4001-a001-000000000001",
+        "name": "Webhook Trigger",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          300
+        ],
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "benchmark-codemode",
+          "responseMode": "lastNode",
+          "options": {}
+        }
+      },
+      {
+        "id": "bb000001-0001-4001-a001-000000000002",
+        "name": "Benchmark Agent",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          300,
+          300
+        ],
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ \"You MUST call the execute_code_chain tool with TypeScript code that processes this customer through a complete 5-step onboarding pipeline. The code must: 1) validate the email and extract domain 2) classify the company by domain/name 3) score customer into a tier (platinum/gold/silver/bronze) 4) generate a personalized onboarding message 5) format a final report with all data. Return the complete report as JSON. Customer data: \" + JSON.stringify($json.body) }}",
+          "options": {
+            "systemMessage": "You are a customer onboarding assistant. You have ONE tool: execute_code_chain. Write a single TypeScript code block that performs ALL 5 steps of customer enrichment (validate email, classify company, score tier, generate message, format report). Do NOT call the tool multiple times — write ALL logic in ONE code block."
+          }
+        }
+      },
+      {
+        "id": "bb000001-0001-4001-a001-000000000003",
+        "name": "Gemini Model",
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          300,
+          550
+        ],
+        "parameters": {
+          "modelName": "models/gemini-2.0-flash",
+          "options": {
+            "temperature": 0.1
+          }
+        },
+        "credentials": {
+          "googlePalmApi": {
+            "id": "FVE8T8mYCgIRpSyv",
+            "name": "Google Gemini"
+          }
+        }
+      },
+      {
+        "id": "bb000001-0001-4001-a001-000000000004",
+        "name": "Code-Mode Tool",
+        "type": "n8n-nodes-utcp-codemode.codeModeTool",
+        "typeVersion": 1,
+        "position": [
+          500,
+          550
+        ],
+        "parameters": {
+          "toolSources": "[]",
+          "timeout": 30000,
+          "memoryLimit": 128
+        }
+      }
+    ],
+    "connections": {
+      "Webhook Trigger": {
+        "main": [
+          [
+            {
+              "node": "Benchmark Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gemini Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Benchmark Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code-Mode Tool": {
+        "ai_tool": [
+          [
+            {
+              "node": "Benchmark Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Marius  J",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-20T18:23:38.745Z",
+        "id": 45,
+        "workflowId": "WVeyUVbK32wI6ZGQ",
+        "versionId": "6075aef2-3740-46e1-99e6-288784303bac",
+        "event": "activated",
+        "userId": "ef4354d8-75df-4047-9d6d-d8972c1eab41"
+      }
+    ]
+  }
+}

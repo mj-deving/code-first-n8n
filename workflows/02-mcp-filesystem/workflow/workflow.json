@@ -1,0 +1,274 @@
+{
+  "id": "Ml4GL2HRJCSpCXtM",
+  "name": "WF10 - MCP Filesystem Code-Mode Test",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mcp-filesystem-test",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        304
+      ],
+      "webhookId": "mcp-fs-test-001"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "List all files in the allowed directory, then read the contents of each file. Return a JSON object with each filename as key and its contents as value.",
+        "options": {
+          "systemMessage": "You have access to execute_code_chain which runs TypeScript in a sandbox with filesystem tools. Write a SINGLE code block that does everything at once. Available functions: fs.filesystem_list_directory({path: \"C:\\Users\\User\\mcp-test\"}), fs.filesystem_read_text_file({path: \"...\"}). Chain all operations in one code block and use return to return the final result. Do NOT call the tool multiple times — write ONE code block that does all the work.",
+          "maxIterations": 15
+        }
+      },
+      "id": "agent",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        304,
+        304
+      ]
+    },
+    {
+      "id": "gemini",
+      "name": "Claude via OpenRouter",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        512,
+        512
+      ],
+      "parameters": {
+        "model": "anthropic/claude-sonnet-4",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "credentials": {
+        "openRouterApi": {
+          "id": "G7NawpVKN9CxuS0T",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolSources": "[{\"name\": \"fs\", \"call_template_type\": \"mcp\", \"config\": {\"mcpServers\": {\"filesystem\": {\"transport\": \"stdio\", \"command\": \"cmd.exe\", \"args\": [\"/c\", \"node\", \"C:\\\\Users\\\\User\\\\AppData\\\\Roaming\\\\npm\\\\node_modules\\\\@modelcontextprotocol\\\\server-filesystem\\\\dist\\\\index.js\", \"C:\\\\Users\\\\User\\\\mcp-test\"]}}}}]",
+        "timeout": 60000
+      },
+      "id": "codemode",
+      "name": "Code-Mode Tool",
+      "type": "n8n-nodes-utcp-codemode.codeModeTool",
+      "typeVersion": 1,
+      "position": [
+        512,
+        704
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude via OpenRouter": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code-Mode Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-20T21:17:41.483Z",
+      "createdAt": "2026-03-20T21:17:41.483Z",
+      "role": "workflow:owner",
+      "workflowId": "Ml4GL2HRJCSpCXtM",
+      "projectId": "aCXUToL316T52fqN",
+      "project": {
+        "updatedAt": "2026-03-11T07:37:14.647Z",
+        "createdAt": "2026-03-11T07:16:46.408Z",
+        "id": "aCXUToL316T52fqN",
+        "name": "Marius  J <mariusclaude@proton.me>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "ef4354d8-75df-4047-9d6d-d8972c1eab41"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-21T05:29:23.074Z",
+    "createdAt": "2026-03-21T05:29:23.074Z",
+    "versionId": "de5ce4b8-a2cc-488b-b483-a25ea9a3581d",
+    "workflowId": "Ml4GL2HRJCSpCXtM",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "mcp-filesystem-test",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "id": "trigger",
+        "name": "Webhook Trigger",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          304
+        ],
+        "webhookId": "mcp-fs-test-001"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "List all files in the allowed directory, then read the contents of each file. Return a JSON object with each filename as key and its contents as value.",
+          "options": {
+            "systemMessage": "You have access to execute_code_chain which runs TypeScript in a sandbox with filesystem tools. Write a SINGLE code block that does everything at once. Available functions: fs.filesystem_list_directory({path: \"C:\\Users\\User\\mcp-test\"}), fs.filesystem_read_text_file({path: \"...\"}). Chain all operations in one code block and use return to return the final result. Do NOT call the tool multiple times — write ONE code block that does all the work.",
+            "maxIterations": 15
+          }
+        },
+        "id": "agent",
+        "name": "AI Agent",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.7,
+        "position": [
+          304,
+          304
+        ]
+      },
+      {
+        "id": "gemini",
+        "name": "Claude via OpenRouter",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "typeVersion": 1,
+        "position": [
+          512,
+          512
+        ],
+        "parameters": {
+          "model": "anthropic/claude-sonnet-4",
+          "options": {
+            "temperature": 0.1
+          }
+        },
+        "credentials": {
+          "openRouterApi": {
+            "id": "G7NawpVKN9CxuS0T",
+            "name": "OpenRouter API"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "toolSources": "[{\"name\": \"fs\", \"call_template_type\": \"mcp\", \"config\": {\"mcpServers\": {\"filesystem\": {\"transport\": \"stdio\", \"command\": \"cmd.exe\", \"args\": [\"/c\", \"node\", \"C:\\\\Users\\\\User\\\\AppData\\\\Roaming\\\\npm\\\\node_modules\\\\@modelcontextprotocol\\\\server-filesystem\\\\dist\\\\index.js\", \"C:\\\\Users\\\\User\\\\mcp-test\"]}}}}]",
+          "timeout": 60000
+        },
+        "id": "codemode",
+        "name": "Code-Mode Tool",
+        "type": "n8n-nodes-utcp-codemode.codeModeTool",
+        "typeVersion": 1,
+        "position": [
+          512,
+          704
+        ]
+      }
+    ],
+    "connections": {
+      "Webhook Trigger": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Claude via OpenRouter": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code-Mode Tool": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Marius  J",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-21T05:29:23.168Z",
+        "id": 68,
+        "workflowId": "Ml4GL2HRJCSpCXtM",
+        "versionId": "de5ce4b8-a2cc-488b-b483-a25ea9a3581d",
+        "event": "activated",
+        "userId": "ef4354d8-75df-4047-9d6d-d8972c1eab41"
+      },
+      {
+        "createdAt": "2026-03-21T05:29:23.132Z",
+        "id": 67,
+        "workflowId": "Ml4GL2HRJCSpCXtM",
+        "versionId": "de5ce4b8-a2cc-488b-b483-a25ea9a3581d",
+        "event": "deactivated",
+        "userId": "ef4354d8-75df-4047-9d6d-d8972c1eab41"
+      }
+    ]
+  }
+}
