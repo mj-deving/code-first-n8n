@@ -1,63 +1,114 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+# CLAUDE.md — Code-First n8n Proving Ground
 
 ## Project
 
-**Code-First n8n Proving Ground.** Proves the n8nac + code-mode lifecycle thesis and produces verified workflow templates. See [THESIS.md](THESIS.md) for the framing, [STATUS.md](STATUS.md) for current state.
+Proves the n8nac + code-mode lifecycle thesis. 5 workflows, all complete. See [README.md](README.md).
 
-## Structure
+## Tech Stack
 
-- `THESIS.md` — **Front door: the n8nac + code-mode lifecycle thesis**
-- `playbook/` — **Portable knowledge** (lifecycle, benchmarks, architecture)
-- `workflows/` — **Workflow templates** — each proves a layer of the thesis
-- `template/` — Scaffold template for new workflows
-- `scripts/` — Shared tooling (new-workflow.sh, check-secrets.sh)
-- `n8n-nodes-utcp-codemode/` — n8n community node (npm)
-- `code-mode-mcp-server/` — CLI + MCP server (npm package renamed to code-mode-tools, directory kept as code-mode-mcp-server)
-- `repo/` — Upstream `universal-tool-calling-protocol/code-mode` (read-only)
-- `n8n-autopilot/` — `mj-deving/n8n-autopilot` (read-only)
-- `archive/` — Research artifacts from exploration phase
-- `docs/decisions/` — ADRs (ADR-0001: CLI-first over MCP-only)
+- **n8n** 2.11.2 (Windows, accessed from WSL via `172.31.224.1:5678`)
+- **n8nac** CLI for code-first workflow dev (`.workflow.ts` format)
+- **LLM** Claude Haiku 4.5 via OpenRouter (default for n8n agents — never Sonnet, too expensive)
+- **OpenRouter credential** ID: `mOL6UoYXfgKf6RZh` (name: "OpenRouter", type: openAiApi)
+- **Gemini credential** ID: `FVE8T8mYCgIRpSyv` (name: "Google Gemini", type: googlePalmApi)
+- **Telegram Bot** credential ID: `nzmbw9ZNGZdA9sZp`
 
-## Workflow Development
+## Key Commands
 
 ```bash
-./scripts/new-workflow.sh <category>/<name> "<Display Name>"
-```
+# Scaffold new workflow
+./scripts/new-workflow.sh agents/06-slack-triage "Slack Message Triage"
 
-Cycle: scaffold → build → `npx n8nac push <filename>` → test → document → commit.
-
-See `.ai/guides/build.md` for full build/test commands across all packages.
-
-## Build Quick Reference
-
-```bash
-# Monorepo (n8n node): build core first, then n8n
+# Build n8n community node (monorepo)
 cd n8n-nodes-utcp-codemode && npm run build && npm test  # 78 tests
 
-# code-mode-tools
+# Build code-mode-tools (separate repo)
 cd ~/projects/code-mode-mcp-server && npm run build && npm test  # 44 tests
 
-# n8nac-tools
+# Build n8nac-tools (separate repo)
 cd ~/projects/n8nac-tools && npm run build && npm test  # 50 tests
 ```
 
-See `.ai/guides/build.md` for per-package details.
+## n8n Workflows
 
-## Architecture
-
-See `.ai/guides/architecture.md` for full architecture, package relationships, and n8n access.
-Key: `@code-mode/core` wraps upstream → consumed by n8n node + code-mode-tools + n8nac-tools.
+| ID | Name | POC |
+|---|---|---|
+| zQ4KCniPiiOS3EEG | WF8 — Benchmark Traditional (5 Tools) | 01 |
+| WVeyUVbK32wI6ZGQ | WF9 — Benchmark Code-Mode (1 Tool) | 01 |
+| Ml4GL2HRJCSpCXtM | WF10 — MCP Filesystem Test | 02 |
+| pDLr3eWlGs9ebf79 | WF5 — AI Multi-Agent Support (traditional) | 03 |
+| hHynFG7HpDYCYiSw | Multi-Agent Dispatch (Code-Mode) | 03 |
+| EBMbixqklugU5WtQ | Dev Loop — Full Lifecycle | 04 |
+| pxCt6Wv92qqUbznT | WF11 — E2E Sibling Tools Test | 05 |
 
 ## Critical Gotchas
 
+### n8n Access from WSL
+- n8n runs on Windows, accessed via vEthernet IP: `172.31.224.1:5678` (NOT localhost)
 - **NEVER `pkill -f "n8n"`** — kills Claude Code too (working dir contains "n8n"). Kill by PID only.
-- **WSL2 → Windows**: Use vEthernet IP (`172.31.224.1`), NOT `localhost`
-- **n8nac push**: ONLY filename, no path — `npx n8nac push workflow.ts`
-- **Lazy imports mandatory**: `@code-mode/core`, `@utcp/mcp`, `@langchain/core/tools`, `zod` must be `await import()` inside `supplyData()`. Eager import crashes n8n on Windows.
+
+### n8nac
+- **Push filename only**: `npx n8nac push workflow.ts` — no path, n8nac resolves from config
+- **n8nac pull is broken**: Third-party bug — looks up API key by instanceIdentifier not host URL. Use `curl` to export from n8n REST API instead.
+- **Init required**: Must run `n8nac init-auth` + `n8nac init-project` before pull/push. See AGENTS.md.
+
+### Code-Mode Tool (n8n node)
+- **Lazy imports mandatory**: `@code-mode/core`, `@utcp/mcp`, `zod` must be `await import()` inside `supplyData()`. Eager import crashes n8n on Windows.
 - **Build order**: Core before n8n (`packages/core/dist/` must exist)
 - **MCP transport: "stdio" required**: Without it, `@utcp/mcp` throws "Unsupported MCP transport: undefined"
-- **Gemini + MCP**: Gemini calls tools but returns empty results. Use Claude/GPT-4o.
-- **Sibling tool args**: Use `args ?? {}` not `args || {}` (falsy primitives are valid args)
-- **CLI-first** (ADR-0001): Same binary for CLI + MCP. Detect TTY vs pipe.
+- **MCP tool sources**: Work in source repo but spawn Linux child processes — fails from Windows n8n. Use n8n-native `toolCode` with `this.helpers.httpRequest` as workaround.
+
+### n8n toolCode Sandbox
+- **No fetch, no require(http)**: Only `this.helpers.httpRequest` works for HTTP calls
+- **query variable**: With `specifyInputSchema: true`, `query` is an object `{query: "..."}` not a string. Access via `query.query`.
+- **Sibling tool args**: Use `args ?? {}` not `args || {}` (falsy primitives are valid)
+
+### LLM Gotchas
+- **Never Sonnet for n8n agents** — $10 burned in 8 tool calls. Haiku max ($0.80/$4 per 1M).
+- **Gemini + n8n tools broken** — Gemini 2.0/2.5 Flash send null tool arguments in n8n toolCode. Use Claude Haiku.
+- **OpenRouter model IDs**: `anthropic/claude-haiku-4-5` works. `anthropic/claude-3.5-sonnet` is dead.
+- **lmChatOpenAi typeVersion 1**: Accepts plain string model IDs. Version 1.3 requires `{mode, value}` object.
+- **Context overflow**: Haiku's 200k context overflows if agent lists all workflows. System prompt must skip listing.
+
+## Project Structure
+
+```
+code-mode/
+├── CLAUDE.md              # This file — AI agent reference
+├── README.md              # Human front door (evolution, benchmarks, dashboard)
+├── AGENTS.md              # n8nac steering (auto-generated by n8nac)
+├── TEMPLATE.md            # Workflow template requirements
+├── workflows/             # 5 proven POC workflows
+│   ├── 01-customer-onboarding/
+│   ├── 02-mcp-filesystem/
+│   ├── 03-multi-agent-dispatch/
+│   ├── agents/04-dev-loop/
+│   └── 05-e2e-sibling-tools/
+├── calculator/            # Token savings calculator (landing page)
+├── playbook/              # Portable knowledge (lifecycle, benchmarks, architecture)
+├── n8n-nodes-utcp-codemode/  # n8n community node (gitignored, own repo)
+├── code-mode-mcp-server/     # CLI + MCP server (gitignored, npm: code-mode-tools)
+├── n8n-autopilot/            # Origin project (gitignored, read-only reference)
+├── repo/                     # Upstream UTCP code-mode (gitignored, read-only)
+├── template/                 # Scaffold source for new workflows
+├── scripts/                  # new-workflow.sh, check-secrets.sh
+├── docs/decisions/           # ADRs
+└── archive/                  # Research artifacts from exploration phase
+```
+
+## Published Packages
+
+| Package | Version | npm |
+|---|---|---|
+| `n8n-nodes-utcp-codemode` | 2.1.0 | [link](https://www.npmjs.com/package/n8n-nodes-utcp-codemode) |
+| `code-mode-tools` | 0.2.0 | [link](https://www.npmjs.com/package/code-mode-tools) |
+| `n8nac-tools` | 1.0.0 | [link](https://www.npmjs.com/package/n8nac-tools) |
+
+## Deep Dives
+
+| Document | What |
+|---|---|
+| [Playbook: Lifecycle](playbook/lifecycle.md) | n8nac + code-mode full framing |
+| [Playbook: Benchmarks](playbook/benchmarks.md) | Token savings data, methodology |
+| [Playbook: Architecture](playbook/architecture.md) | How core, n8n node, MCP server fit |
+| [ADR-0001](docs/decisions/ADR-0001-cli-first-over-mcp-only.md) | CLI-first over MCP-only |

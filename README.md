@@ -166,7 +166,7 @@ Built on top of [@utcp/code-mode](https://www.npmjs.com/package/@utcp/code-mode)
 ./scripts/new-workflow.sh agents/06-slack-triage "Slack Message Triage"
 ```
 
-This scaffolds a complete workflow directory from [template/](template/) with README, workflow.ts skeleton, test.json stub, and all sections pre-filled. See [TEMPLATE.md](TEMPLATE.md) for the hybrid approach.
+This scaffolds a complete workflow directory from [template/](template/) with README, workflow.ts skeleton, test.json stub, and all sections pre-filled. See [docs/TEMPLATE.md](docs/TEMPLATE.md) for the workflow template requirements.
 
 **Workflow lifecycle:** Develop in this monorepo → prove with benchmarks → distribute via n8n community templates and blog posts.
 
@@ -174,8 +174,7 @@ This scaffolds a complete workflow directory from [template/](template/) with RE
 
 | Document | What's Inside |
 |---|---|
-| [THESIS.md](THESIS.md) | The full thesis — why n8nac + code-mode cover the entire lifecycle |
-| [TEMPLATE.md](TEMPLATE.md) | Hybrid workflow template approach (develop → prove → graduate) |
+| [docs/TEMPLATE.md](docs/TEMPLATE.md) | Workflow template requirements and lifecycle |
 | [Playbook: Lifecycle](playbook/lifecycle.md) | Portable framing of the code-first n8n story |
 | [Playbook: Benchmarks](playbook/benchmarks.md) | Token savings data, methodology, cost projections |
 | [Playbook: Architecture](playbook/architecture.md) | How @code-mode/core, n8n node, and MCP server fit together |
