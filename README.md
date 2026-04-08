@@ -38,7 +38,7 @@ Each POC proves one layer of the thesis with real data:
 | [01 — Customer Onboarding](workflows/01-customer-onboarding/) | Runtime: 96% token savings | Benchmarked |
 | [02 — MCP Filesystem](workflows/02-mcp-filesystem/) | Real file operations through MCP in sandbox | Verified |
 | [03 — Multi-Agent Dispatch](workflows/03-multi-agent-dispatch/) | 16-node workflow → 1 code block | Analyzed |
-| [04 — Dev Loop](workflows/agents/04-dev-loop/) | Full lifecycle: n8nac → code-mode end-to-end | Designed |
+| [04 — Dev Loop](workflows/agents/04-dev-loop/) | Full lifecycle: n8nac → code-mode end-to-end | **E2E Proven** |
 | [05 — E2E Sibling Tools](workflows/05-e2e-sibling-tools/) | Zero-config tool discovery + execution | **8/8 pass** |
 
 ## Repo Map

@@ -1,5 +1,9 @@
 import { workflow, node, links } from '@n8n-as-code/transformer';
 
+// NOTE: workflow.json needs re-export from n8n to match the live workflow.
+// The JSON was exported before the Haiku migration and still references
+// claude-3.5-sonnet and the old Code-Mode Tool node.
+
 // <workflow-map>
 // Workflow : Dev Loop — Full Lifecycle
 // Nodes   : 4  |  Connections: 3
@@ -7,7 +11,7 @@ import { workflow, node, links } from '@n8n-as-code/transformer';
 // NODE INDEX
 // ----------
 // WebhookTrigger            webhook                 [trigger]
-// ClaudeViaOpenRouter       lmChatOpenAi            [ai_languageModel]
+// HaikuViaOpenRouter        lmChatOpenAi            [ai_languageModel]
 // N8nApiTool                toolCode                [ai_tool]
 // AiAgent                   agent
 //
@@ -17,7 +21,7 @@ import { workflow, node, links } from '@n8n-as-code/transformer';
 //
 // AI CONNECTIONS
 // --------------
-// AiAgent.uses({ ai_languageModel: ClaudeViaOpenRouter.output, ai_tool: [N8nApiTool.output] })
+// AiAgent.uses({ ai_languageModel: HaikuViaOpenRouter.output, ai_tool: [N8nApiTool.output] })
 // </workflow-map>
 
 @workflow({
@@ -47,13 +51,13 @@ export class DevLoopWorkflow {
 
     @node({
         id: '8df3d95d-d130-4654-ad3f-b6384d82d7bc',
-        name: 'Claude via OpenRouter',
+        name: 'Haiku via OpenRouter',
         type: '@n8n/n8n-nodes-langchain.lmChatOpenAi',
         version: 1,
         position: [460, 200],
     })
-    ClaudeViaOpenRouter = {
-        model: 'anthropic/claude-sonnet-4',
+    HaikuViaOpenRouter = {
+        model: 'anthropic/claude-haiku-4-5',
         options: {
             temperature: 0.1,
         },
@@ -80,17 +84,18 @@ const apiKey = $env.N8N_API_KEY;
 
 const opts = {
   method,
+  url: baseUrl + path,
   headers: {
     'Content-Type': 'application/json',
     'X-N8N-API-KEY': apiKey
-  }
+  },
+  json: true
 };
 if (body && (method === 'POST' || method === 'PUT')) {
-  opts.body = body;
+  opts.body = JSON.parse(body);
 }
 
-const res = await fetch(baseUrl + path, opts);
-const data = await res.json();
+const data = await this.helpers.httpRequest(opts);
 return JSON.stringify(data, null, 2);`,
         specifyInputSchema: false,
     };
@@ -142,7 +147,7 @@ Keep it simple. For a hello-world webhook, create a minimal 2-node workflow: Web
         this.WebhookTrigger.out(0).to(this.AiAgent.in(0));
 
         this.AiAgent.uses({
-            ai_languageModel: this.ClaudeViaOpenRouter.output,
+            ai_languageModel: this.HaikuViaOpenRouter.output,
             ai_tool: [this.N8nApiTool.output],
         });
     }

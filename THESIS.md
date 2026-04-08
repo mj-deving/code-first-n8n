@@ -57,7 +57,7 @@ This repo is a **proving ground**. Each POC template in `workflows/` proves one 
 | [01 — Customer Onboarding](workflows/01-customer-onboarding/) | Runtime: 96% token savings | Benchmarked |
 | [02 — MCP Filesystem](workflows/02-mcp-filesystem/) | Runtime + MCP: real file ops in sandbox | Verified |
 | [03 — Multi-Agent Dispatch](workflows/03-multi-agent-dispatch/) | Architecture: 16 nodes → 1 code block | Analyzed |
-| [04 — Dev Loop](workflows/agents/04-dev-loop/) | Full lifecycle: n8nac → code-mode end-to-end | Designed |
+| [04 — Dev Loop](workflows/agents/04-dev-loop/) | Full lifecycle: n8nac → code-mode end-to-end | **E2E Proven** |
 | [05 — E2E Sibling Tools](workflows/05-e2e-sibling-tools/) | Auto-register: zero-config tool discovery | **8/8 pass** |
 
 ## Published Packages

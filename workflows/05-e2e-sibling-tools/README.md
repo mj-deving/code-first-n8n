@@ -79,4 +79,4 @@ npx n8nac push <path-to-wf11-workflow.ts>
 - [x] Tool description refined for explicit sibling call syntax
 - [x] Full E2E verified: `100+200=300`, `17+25=42`, `42*3=126`
 - [ ] `workflow.ts` — n8nac export of WF11
-- [ ] `test.ts` — automated E2E test
+- [ ] `test.json` — automated E2E test

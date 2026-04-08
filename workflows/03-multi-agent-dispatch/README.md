@@ -2,6 +2,8 @@
 
 ## Overview
 
+**Note:** This workflow is currently a design analysis only -- no implementation artifacts exist yet. The analysis below demonstrates the complexity reduction possible with code-mode.
+
 This POC documents the architectural reduction of a 16-node multi-agent dispatcher into a code-mode workflow that keeps the specialist calls but removes most orchestration plumbing. It is still design-only, but it frames how code-mode can replace switch, merge, and routing overhead with ordinary TypeScript control flow.
 
 **Trigger:** TBD <!-- TODO: document the future workflow trigger or webhook path -->  
@@ -82,4 +84,4 @@ npx n8nac push <path-to-wf5-codemode-workflow.ts>
 - [ ] `workflow.ts` — Code-mode version of WF5 (TODO: needs Gemini API as tool source)
 - [ ] `workflow-traditional.ts` — Original WF5 exported via n8nac
 - [ ] Benchmark executed
-- [ ] `test.ts` — automated test comparing both approaches
+- [ ] `test.json` — automated test comparing both approaches

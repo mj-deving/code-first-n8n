@@ -4,9 +4,9 @@
 
 This POC compares a traditional multi-tool AI workflow against a code-mode version that executes the same customer onboarding logic inside one sandboxed TypeScript run. It is the benchmark case for the core runtime claim: fewer LLM round-trips, fewer nodes, and lower latency without changing the business task.
 
-**Trigger:** TBD <!-- TODO: document the webhook path or invocation method for WF8 and WF9 -->  
+**Trigger:** n8n API execution (benchmark workflows WF8/WF9)  
 **Nodes:** WF8 `22`, WF9 `3`  
-**LLM:** TBD <!-- TODO: document the model and credential used for the benchmark -->  
+**LLM:** Gemini 2.0 Flash (via Google AI)  
 **Workflows:** `zQ4KCniPiiOS3EEG` (WF8), `WVeyUVbK32wI6ZGQ` (WF9)
 
 ## Flow
@@ -78,5 +78,5 @@ npx n8nac push <path-to-wf9-workflow.ts>
 - [x] Code-mode workflow built and benchmarked (WF9)
 - [x] Results documented
 - [ ] `workflow.ts` — n8nac-compatible workflow definition (TODO: export from n8n)
-- [ ] `test.ts` — automated test harness (TODO: code-mode test execution)
+- [ ] `test.json` — automated test harness (TODO: code-mode test execution)
 - [ ] Reproducible from terminal (TODO: n8nac push + test cycle)

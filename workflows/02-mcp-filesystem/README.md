@@ -73,5 +73,5 @@ npx n8nac push <path-to-wf10-workflow.ts>
 - [x] Claude successfully reads real files through sandbox
 - [x] Results documented
 - [ ] `workflow.ts` — n8nac-compatible workflow definition (TODO: export from n8n)
-- [ ] `test.ts` — automated test that verifies file read/write through sandbox
+- [ ] `test.json` — automated test that verifies file read/write through sandbox
 - [ ] Benchmark vs direct MCP calls (TODO: measure exact overhead)
