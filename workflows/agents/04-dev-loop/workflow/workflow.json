@@ -1,7 +1,110 @@
 {
   "name": "Dev Loop — Full Lifecycle",
-  "nodes": [],
-  "connections": {},
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "dev-loop",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "e0f84f02-755e-4c8c-9d67-f2e61a86342b",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "8f2f6218-9be7-4b75-8758-6c30cd22d31a"
+    },
+    {
+      "parameters": {
+        "model": {
+          "mode": "list",
+          "value": "anthropic/claude-3.5-sonnet"
+        },
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "id": "8df3d95d-d130-4654-ad3f-b6384d82d7bc",
+      "name": "Claude via OpenRouter",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        460,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "toolSources": "[\n  {\n    \"name\": \"n8nac\",\n    \"call_template_type\": \"mcp\",\n    \"config\": {\n      \"mcpServers\": {\n        \"n8nac\": {\n          \"transport\": \"stdio\",\n          \"command\": \"node\",\n          \"args\": [\"/home/mj/projects/n8nac-tools/dist/index.js\"]\n        }\n      }\n    }\n  },\n  {\n    \"name\": \"n8n\",\n    \"call_template_type\": \"http\",\n    \"config\": {\n      \"baseUrl\": \"http://172.31.224.1:5678/api/v1\",\n      \"headers\": {\n        \"X-N8N-API-KEY\": \"{{$env.N8N_API_KEY}}\"\n      }\n    }\n  }\n]",
+        "timeout": 60000,
+        "memoryLimit": 256
+      },
+      "id": "d6255a2e-4cc7-48c4-b438-b68dc48857fb",
+      "name": "Code-Mode Tool",
+      "type": "n8n-nodes-utcp-codemode.codeModeTool",
+      "typeVersion": 1,
+      "position": [
+        460,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ `Task: ${$json.body?.task || $json.task || 'No task provided'}\n\nPayload:\n${JSON.stringify($json.body || $json, null, 2)}` }}",
+        "options": {
+          "systemMessage": "You are the dev-loop orchestrator for n8n workflows. Use the Code-Mode Tool to complete the full lifecycle end to end: inspect the request, search for the right nodes, write workflow TypeScript with n8nac decorator syntax, push it to n8n, execute tests through the n8n API or webhook, inspect results, and iterate until it works or you have a concrete blocker. Prefer tool calls over speculation. Return a concise report with the workflow name or ID, actions taken, test result, and any remaining blocker."
+        }
+      },
+      "id": "8bb633b0-f823-4354-b27c-acdee83b4256",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        680,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude via OpenRouter": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code-Mode Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
   "settings": {
     "executionOrder": "v1"
   },

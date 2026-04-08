@@ -1,7 +1,29 @@
 [
   {
-    "description": "Basic test — happy path",
-    "input": {},
-    "expected": {}
+    "description": "Happy path: build and verify a hello-world webhook workflow",
+    "input": {
+      "task": "Build a hello-world webhook workflow that returns {greeting: \"hello\"}"
+    },
+    "expected": {
+      "shouldMention": [
+        "workflow",
+        "push",
+        "test",
+        "hello"
+      ]
+    }
+  },
+  {
+    "description": "Lifecycle check: search, deploy, execute, and report results",
+    "input": {
+      "task": "Build a webhook workflow that returns {status: \"ok\"}, deploy it, run one test request, and report the execution outcome."
+    },
+    "expected": {
+      "shouldMention": [
+        "deploy",
+        "execution",
+        "result"
+      ]
+    }
   }
 ]

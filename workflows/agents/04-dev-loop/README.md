@@ -7,7 +7,7 @@
 Register n8nac CLI commands and n8n REST API endpoints as UTCP tools inside code-mode. The AI agent writes a single TypeScript block that searches for nodes, builds a workflow, pushes it to n8n, sends test payloads, and checks results — the full development loop in one sandbox execution.
 
 **Trigger:** webhook
-**Nodes:** 3 (Trigger → Code-Mode Tool → AI Agent)
+**Nodes:** 4 total (Webhook Trigger → AI Agent, with Chat Model + Code-Mode Tool as AI sub-nodes)
 **LLM:** Claude via OpenRouter
 **Category:** agents
 
@@ -15,14 +15,15 @@ Register n8nac CLI commands and n8n REST API endpoints as UTCP tools inside code
 
 ```mermaid
 graph LR
-    A["Webhook<br/>POST /dev-loop"] --> B["Code-Mode Tool"]
-    B --> C["AI Agent<br/>Claude"]
+    A["Webhook<br/>POST /dev-loop"] --> D["AI Agent<br/>Claude"]
+    B["Claude via OpenRouter"] -. ai_languageModel .-> D
+    C["Code-Mode Tool"] -. ai_tool .-> D
 
     subgraph "Inside Sandbox"
-        D["n8nac.search()"] --> E["n8nac.push()"]
-        E --> F["n8n.execute()"]
-        F --> G["n8n.getExecution()"]
-        G --> H["return results"]
+        E["n8nac_search()"] --> F["n8nac_push()"]
+        F --> G["n8n API calls"]
+        G --> H["execution checks"]
+        H --> I["return report"]
     end
 ```
 
@@ -30,12 +31,8 @@ graph LR
 
 | Tool | Source | What It Does |
 |---|---|---|
-| `n8nac.search` | n8nac MCP server | Search available n8n nodes by topic |
-| `n8nac.push` | n8nac MCP server | Push workflow to n8n instance |
-| `n8nac.validate` | n8nac MCP server | Validate workflow definition |
-| `n8n.activate` | n8n REST API | Activate a workflow |
-| `n8n.execute` | n8n REST API | Trigger workflow execution |
-| `n8n.getExecution` | n8n REST API | Get execution result by ID |
+| `n8nac_*` | n8nac MCP server | Search nodes, push workflows, pull, verify, or make raw n8n API calls through the MCP server |
+| `n8n` HTTP calls | n8n REST API | Call `/api/v1` endpoints directly with the `X-N8N-API-KEY` header from `{{$env.N8N_API_KEY}}` |
 
 ## The Vision
 
@@ -91,31 +88,55 @@ curl -X POST http://$WIN_IP:5678/webhook/dev-loop \
       "n8nac": {
         "transport": "stdio",
         "command": "node",
-        "args": ["/path/to/n8nac-mcp-server/dist/index.js"]
+        "args": ["/home/mj/projects/n8nac-tools/dist/index.js"]
       }
     }
   }
 }
 ```
 
+**n8n REST API source**
+
+```json
+{
+  "name": "n8n",
+  "call_template_type": "http",
+  "config": {
+    "baseUrl": "http://172.31.224.1:5678/api/v1",
+    "headers": {
+      "X-N8N-API-KEY": "{{$env.N8N_API_KEY}}"
+    }
+  }
+}
+```
+
+## Implementation Notes
+
+- Workflow source: `workflows/agents/04-dev-loop/workflow/workflow.ts`
+- JSON export: `workflows/agents/04-dev-loop/workflow/workflow.json`
+- Test payloads: `workflows/agents/04-dev-loop/test.json`
+- The workflow uses `responseMode: "lastNode"` so the webhook caller can receive the AI Agent's report directly.
+- The task requested `@n8n/n8n-nodes-langchain.lmChatOpenAi` with an `openAiApi` credential configured for OpenRouter. Local repo notes also mention that some n8n instances work better with the dedicated `lmChatOpenRouter` node, so swap the model node type if your credential setup expects that.
+
 ## Status
 
 - [x] Concept documented
 - [x] Tool list defined
 - [x] Flow diagram created
-- [ ] n8nac MCP server built (wraps n8nac CLI as MCP tools)
-- [ ] n8n REST API registered as HTTP tool source
-- [ ] workflow.ts built on n8n
+- [x] n8nac MCP server built (wraps n8nac CLI as MCP tools)
+- [x] n8n REST API registered as HTTP tool source
+- [x] `workflow.ts` implemented
+- [x] `workflow.json` exported in repo
+- [x] `test.json` populated with real webhook payloads
 - [ ] End-to-end: AI builds + deploys + tests a workflow in one execution
 - [ ] Benchmarked vs manual dev loop
 
 ## What's Next
 
-1. Build `n8nac-mcp-server` wrapping key n8nac CLI commands
-2. Register n8n REST API as HTTP tool source in code-mode
-3. Build WF on n8n with both tool sources
-4. Test: "Build me a hello world webhook workflow"
-5. Benchmark: manual vs code-mode dev loop
+1. Import or push the workflow and attach the OpenRouter-backed `openAiApi` credential in n8n
+2. Run the hello-world payload from `workflows/agents/04-dev-loop/test.json`
+3. Confirm the agent can search, push, execute, and report results end to end
+4. Benchmark the automated loop against the manual process
 
 ---
 
