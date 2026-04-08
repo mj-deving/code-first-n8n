@@ -1,0 +1,22 @@
+[
+  {
+    "description": "Sibling tool round-trip - calculator calls code-mode sibling",
+    "input": {
+      "query": "What is 15 * 7?"
+    },
+    "expected": {
+      "result": 105,
+      "shouldMention": ["105"]
+    }
+  },
+  {
+    "description": "Full E2E - agent uses both calculator and sibling tool",
+    "input": {
+      "query": "Calculate 42 + 58 and verify the result"
+    },
+    "expected": {
+      "result": 100,
+      "shouldMention": ["100"]
+    }
+  }
+]

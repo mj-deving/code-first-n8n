@@ -1,87 +1,93 @@
-# POC-03: Multi-Agent Dispatch → 1 Code Block
+# POC-03: Multi-Agent Dispatch -> 1 AI Agent
 
 ## Overview
 
-**Note:** This workflow is currently a design analysis only -- no implementation artifacts exist yet. The analysis below demonstrates the complexity reduction possible with code-mode.
+This POC implements the code-mode reduction of a traditional 16-node multi-agent dispatcher into a 3-node workflow. Instead of separate dispatcher, routing, specialist, fallback, and quality-check nodes, one AI Agent handles classification, specialist behavior, urgency detection, and response formatting in a single pass.
 
-This POC documents the architectural reduction of a 16-node multi-agent dispatcher into a code-mode workflow that keeps the specialist calls but removes most orchestration plumbing. It is still design-only, but it frames how code-mode can replace switch, merge, and routing overhead with ordinary TypeScript control flow.
-
-**Trigger:** TBD <!-- TODO: document the future workflow trigger or webhook path -->  
-**Nodes:** Traditional `16`, code-mode target `3`  
-**LLM:** Gemini specialist calls remain; orchestration model setup TBD <!-- TODO: document once implemented -->  
-**Source workflow:** WF5 from `n8n-autopilot`
+**Trigger:** Webhook `POST /multi-agent-dispatch`  
+**Nodes:** Traditional `16`, code-mode `3`  
+**LLM:** Claude Haiku 4.5 via OpenRouter (`anthropic/claude-haiku-4-5`)  
+**Code-mode workflow:** `workflows/03-multi-agent-dispatch/workflow/workflow.ts`
 
 ## Flow
 
 ```mermaid
 graph LR
-    A["Incoming request"] --> B["Dispatcher Agent"]
-    B --> C["Specialist A"]
-    B --> D["Specialist B"]
-    B --> E["Specialist C"]
-    B --> F["Specialist D"]
-    C --> G["Merge + Quality Check"]
-    D --> G
-    E --> G
-    F --> G
-    A --> H["Code-Mode alternative"]
-    H --> I["Single TypeScript block"]
-    I --> J["Specialist API calls + aggregation + quality check"]
+    A["Webhook Trigger<br/>POST /multi-agent-dispatch"] --> B["AI Agent<br/>classify -> specialist -> quality check"]
+    C["Haiku via OpenRouter<br/>Claude Haiku 4.5"] -. ai_languageModel .-> B
+    B --> D["Structured JSON response"]
 ```
 
 ## Nodes
 
 | Node | Type | Purpose |
 |---|---|---|
-| Dispatcher Agent | AI Agent | Routes the request to the correct specialist paths in the traditional design |
-| Specialist Agents | AI Agents | Perform the domain-specific sub-tasks |
-| Merge + Quality Check | Merge / AI Agent | Aggregates specialist outputs and verifies quality |
-| Code-Mode Tool | Tool sub-node | Planned replacement for the routing and merge logic |
-| Single TypeScript block | Generated code | Planned orchestration layer for dispatch, aggregation, and return |
+| Webhook Trigger | `n8n-nodes-base.webhook` | Receives incoming customer requests over `POST /multi-agent-dispatch` |
+| Haiku via OpenRouter | `@n8n/n8n-nodes-langchain.lmChatOpenAi` | Supplies the chat model used by the agent |
+| AI Agent | `@n8n/n8n-nodes-langchain.agent` | Classifies the request, responds with specialist behavior, performs a quality check, and returns structured JSON |
+
+## Traditional vs Code-Mode Architecture
+
+The traditional WF5 design spreads the dispatch problem across 16 nodes:
+
+- Webhook trigger
+- Dispatcher classifier and parser
+- Route switch
+- Separate tech, sales, and FAQ specialists
+- Fallback response logic
+- Quality check
+- Urgency filter and Telegram alert
+- Final webhook response
+
+The code-mode version keeps the same business behavior but removes the orchestration graph. The AI Agent receives the request once, decides which specialist behavior to emulate, checks response quality, flags urgency, and returns JSON in one pass. The routing logic is expressed in prompt instructions rather than switch nodes and merge nodes.
 
 ## Test
 
-<!-- TODO: add a real curl command after the code-mode variant is implemented -->
 ```bash
-curl -X POST http://<n8n-host>/webhook/<wf5-codemode-endpoint> \
+curl -X POST http://localhost:5678/webhook/multi-agent-dispatch \
   -H "Content-Type: application/json" \
-  -d '{"request":"<payload that exercises multiple specialists>"}'
+  -d '{
+    "message": "URGENT: Our production n8n instance is completely down and workflows are not executing. This is blocking our customer onboarding pipeline."
+  }'
 ```
 
-Expected output: a structured response showing specialist outputs, aggregation, and quality-check results from one code-mode execution.
+Expected output: JSON with `category`, `urgent`, `response`, and `confidence`, for example a `tech` classification with `urgent: true`.
 
 ## Benchmark
 
-<!-- TODO: run the benchmark once both the traditional and code-mode variants are implemented -->
-| Metric | Traditional WF5 | Code-mode target | Status |
+This is currently a design comparison only. We have the implemented `workflow.ts`, but no runtime benchmark yet because the workflow still needs to be pushed to n8n and measured there.
+
+| Metric | Traditional WF5 | Code-mode WF03 | Status |
 |---|---|---|---|
-| Node count | 16 | 3 | Design target only |
-| Specialist LLM calls | 4 | 4 | Design target only |
-| Orchestration layer | Dispatcher + switch + merge + quality check | One TypeScript block | Design target only |
+| Node count | 16 | 3 | Design comparison documented |
+| LLM calls | 4 specialist/dispatcher calls | 1 agent call | Design comparison documented |
+| Routing logic | Switch + parser + fallback + quality nodes | One AI Agent pass | Design comparison documented |
+| Runtime benchmark | Not captured here | Not captured yet | Pending push and measurement |
 
 ## Install
 
 ```bash
-# n8nac push
-# TODO: create and export the code-mode workflow, then replace this placeholder.
-npx n8nac push <path-to-wf5-codemode-workflow.ts>
+npx n8nac push workflows/03-multi-agent-dispatch/workflow/workflow.ts
 ```
 
-```bash
-# Import via JSON
-# TODO: export the workflow from n8n, then document the JSON import steps here.
-```
+After pushing the workflow:
+
+1. Open the generated workflow in n8n.
+2. Configure the OpenRouter-backed credential used by `Haiku via OpenRouter`.
+3. Activate the workflow.
+4. Export `workflow.json` from n8n if you want the checked-in JSON snapshot to match the live workflow.
 
 ## What This Proves
 
-- **Lifecycle layer:** Architecture
-- **Thesis claim:** Complex multi-agent orchestration workflows collapse into a single code-mode execution, eliminating orchestration overhead while preserving sub-agent LLM calls
+- **Lifecycle layer:** Architecture -> runnable workflow definition
+- **Thesis claim:** Multi-agent dispatch logic can collapse from a many-node orchestration graph into one AI Agent call without separate classifier, router, specialist, and quality-check nodes
 
 ## Status
 
-- [x] Pattern identified and analyzed (from n8n-autopilot WF5)
-- [x] Architecture documented (traditional vs code-mode)
-- [ ] `workflow.ts` — Code-mode version of WF5 (TODO: needs Gemini API as tool source)
-- [ ] `workflow-traditional.ts` — Original WF5 exported via n8nac
-- [ ] Benchmark executed
-- [ ] `test.json` — automated test comparing both approaches
+- [x] Pattern identified from the traditional WF5 design
+- [x] Traditional vs code-mode architecture documented
+- [x] `workflow.ts` implemented for the 3-node code-mode workflow
+- [x] `test.json` added for representative tech, sales, FAQ, and urgent cases
+- [x] Benchmark section updated as a design comparison
+- [ ] Workflow pushed to n8n and exported as `workflow.json`
+- [ ] Runtime benchmark executed against the live n8n workflow

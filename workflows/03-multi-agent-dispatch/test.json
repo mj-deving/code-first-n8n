@@ -1,0 +1,43 @@
+[
+  {
+    "description": "Tech support request - should classify as tech",
+    "input": {
+      "message": "My n8n instance keeps crashing after upgrading to 2.11. The error log shows 'heap out of memory'. How do I fix this?"
+    },
+    "expected": {
+      "category": "tech",
+      "shouldMention": ["memory", "heap", "NODE_OPTIONS"]
+    }
+  },
+  {
+    "description": "Sales inquiry - should classify as sales",
+    "input": {
+      "message": "We're evaluating n8n for our 50-person team. What's the pricing for the enterprise plan and do you offer volume discounts?"
+    },
+    "expected": {
+      "category": "sales",
+      "shouldMention": ["enterprise", "pricing"]
+    }
+  },
+  {
+    "description": "FAQ question - should classify as faq",
+    "input": {
+      "message": "How do I connect n8n to Google Sheets?"
+    },
+    "expected": {
+      "category": "faq",
+      "shouldMention": ["Google Sheets", "credentials"]
+    }
+  },
+  {
+    "description": "Urgent tech issue - should flag as urgent",
+    "input": {
+      "message": "URGENT: Our production n8n instance is completely down and workflows are not executing. This is blocking our customer onboarding pipeline."
+    },
+    "expected": {
+      "category": "tech",
+      "urgent": true,
+      "shouldMention": ["production", "restart"]
+    }
+  }
+]

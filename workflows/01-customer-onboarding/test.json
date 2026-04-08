@@ -1,0 +1,24 @@
+[
+  {
+    "description": "Standard customer onboarding - validate, classify, score, message, report",
+    "input": {
+      "name": "Maria Schmidt",
+      "email": "maria.schmidt@microsoft.com",
+      "company": "Microsoft Deutschland GmbH"
+    },
+    "expected": {
+      "shouldMention": ["enterprise", "tier", "onboarding"]
+    }
+  },
+  {
+    "description": "Small business customer",
+    "input": {
+      "name": "John Doe",
+      "email": "john@smallbiz.com",
+      "company": "SmallBiz LLC"
+    },
+    "expected": {
+      "shouldMention": ["tier", "onboarding"]
+    }
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "description": "Read a file through MCP filesystem in sandbox",
+    "input": {
+      "code": "const content = filesystem.read_file({path: '/tmp/test.txt'}); return content;"
+    },
+    "expected": {
+      "shouldContain": "file content"
+    }
+  },
+  {
+    "description": "List directory through MCP filesystem in sandbox",
+    "input": {
+      "code": "const files = filesystem.list_directory({path: '/tmp'}); return files;"
+    },
+    "expected": {
+      "shouldContain": "entries"
+    }
+  }
+]
