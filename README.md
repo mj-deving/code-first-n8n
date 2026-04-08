@@ -17,17 +17,15 @@ This repo proves that two tools together cover the entire n8n workflow lifecycle
 This project didn't start here. It evolved through three phases:
 
 ```
-n8n-autopilot (2025)          n8nac matures (2026-Q1)       code-mode integration (2026-Q1/Q2)
+n8n UI only (2025)            n8nac adoption (2025-2026)     code-mode integration (2026)
 ─────────────────────    →    ─────────────────────    →    ──────────────────────────────
-Built workflows in n8n        Built the tool that            Built the runtime that
-manually. Felt the pain       writes workflows from          executes them in one shot.
-of click-driven dev.          TypeScript. Dev-time solved.   Runtime solved.
-German UI, 16-node WFs,       n8nac push/pull/verify,        isolated-vm sandbox,
-check-secrets.sh born here.   .workflow.ts format,           96% token savings,
-                              code-as-config thesis forms.   full lifecycle proven.
+Built workflows by clicking   Adopted n8n-as-code (n8nac).   Added code-mode runtime.
+in the n8n editor. 16-node    TypeScript workflows, CLI      Sandboxed execution collapses
+WFs, manual testing, no       push/pull/verify. Our POC      N LLM calls into one. Full
+version control. Fragile.     repo: n8n-autopilot.           lifecycle proven here.
 ```
 
-**[n8n-autopilot](https://github.com/mj-deving/n8n-autopilot)** proved the pain — complex workflows are unmaintainable in a visual UI. **n8nac** solved dev-time by making workflows code-first. **code-mode** solved runtime by collapsing N tool calls into one sandboxed execution. This proving ground brings both together and measures the results.
+**Phase 1** proved the pain — complex workflows are unmaintainable in a visual UI. **Phase 2** solved dev-time by adopting [n8nac](https://github.com/mj-deving/n8n-autopilot) for code-first authoring. **Phase 3** solved runtime by adding code-mode — collapsing N tool calls into one sandboxed execution. This proving ground brings both together and measures the results.
 
 ## The Lifecycle
 
