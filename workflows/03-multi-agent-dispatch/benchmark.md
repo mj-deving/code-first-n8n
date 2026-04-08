@@ -3,7 +3,7 @@
 **Date:** 2026-04-07
 **LLM:** Claude Haiku 4.5 via OpenRouter (anthropic/claude-haiku-4-5)
 **Scenario:** Customer support dispatch — classify request, route to specialist, quality check, return structured JSON
-**Status:** Design comparison only — no runtime benchmark captured yet
+**Status:** E2E proven — runtime benchmark captured 2026-04-08
 
 ## Test Input
 
@@ -73,6 +73,15 @@ The code-mode version collapses the entire dispatch graph into one AI Agent call
 
 3. **Prompt replaces graph.** The routing logic that required 13 orchestration nodes (switch, merge, fallback, quality check, urgency filter) is expressed as prompt instructions in one AI Agent node.
 
-4. **Runtime benchmark pending.** These numbers are from design analysis. The workflow.ts is implemented and ready for push to n8n, but no execution timing has been captured yet.
+4. **Runtime verified.** All 4 test cases pass on n8n workflow `hHynFG7HpDYCYiSw`:
+
+| Test | Category | Urgent | Time | Correct |
+|------|----------|--------|------|---------|
+| Tech support (heap OOM) | tech | true | 5.2s | Yes |
+| Sales inquiry (pricing) | sales | false | 3.7s | Yes |
+| FAQ (Google Sheets) | tech | false | 5.2s | Reasonable (tech/faq boundary is fuzzy) |
+| Urgent production down | tech | true | 8.6s | Yes |
+
+Average response time: **5.7s** with Haiku at ~$0.02 per request.
 
 5. **Maintenance cost drops dramatically.** Changing specialist behavior means editing one system prompt vs reconfiguring multiple nodes and their connections.

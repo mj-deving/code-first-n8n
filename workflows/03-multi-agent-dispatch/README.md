@@ -88,6 +88,6 @@ After pushing the workflow:
 - [x] Traditional vs code-mode architecture documented
 - [x] `workflow.ts` implemented for the 3-node code-mode workflow
 - [x] `test.json` added for representative tech, sales, FAQ, and urgent cases
-- [x] Benchmark section updated as a design comparison
-- [ ] Workflow pushed to n8n and exported as `workflow.json`
-- [ ] Runtime benchmark executed against the live n8n workflow
+- [x] Benchmark section with design comparison + runtime data
+- [x] Workflow pushed to n8n (`hHynFG7HpDYCYiSw`) and `workflow.json` exported
+- [x] Runtime E2E: 4/4 test cases pass (avg 5.7s, ~$0.02/request with Haiku)
