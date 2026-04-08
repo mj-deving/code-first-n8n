@@ -4,6 +4,10 @@
 
 Proves the n8nac + code-mode lifecycle thesis. 5 workflows, all complete. See [README.md](README.md).
 
+## MANDATORY: Read before n8nac/workflow operations
+
+**Before ANY n8nac command (pull, push, list, verify) or workflow creation/editing, READ `AGENTS.md` first.** It contains the complete n8nac protocol: initialization, GitOps sync workflow, research protocol, decorator syntax, and common mistakes. Do not guess — the answers are documented there. This file cost us multiple wasted iterations when we didn't read it.
+
 ## Tech Stack
 
 - **n8n** 2.11.2 (Windows, accessed from WSL via `172.31.224.1:5678`)
