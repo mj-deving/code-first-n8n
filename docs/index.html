@@ -66,7 +66,9 @@ section{padding:64px 0}
 .metric{font-family:var(--font-mono);font-size:0.75rem;padding:4px 10px;border-radius:6px;background:var(--green-dim);color:var(--green);font-weight:500}
 .workflow-status{font-family:var(--font-mono);font-size:0.7rem;color:var(--green);font-weight:500;display:flex;align-items:center;gap:6px;margin-bottom:12px}
 .status-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
-.workflow-diagram{background:var(--surface-elevated);border:1px solid var(--border);border-radius:8px;padding:16px;display:flex;align-items:center;justify-content:center;min-height:100px}
+.workflow-diagram{background:var(--surface-elevated);border:1px solid var(--border);border-radius:8px;padding:24px;min-height:120px;overflow:visible}
+.workflow-diagram .mermaid{width:100%}
+.workflow-diagram .mermaid svg{width:100%;min-height:80px}
 .how-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;font-family:var(--font-mono);font-size:0.8rem;line-height:2;overflow-x:auto}
 .line-trad{color:var(--red)}.line-cm{color:var(--green)}.line-dim{color:var(--text-dim)}
 .packages-table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
@@ -82,7 +84,7 @@ section{padding:64px 0}
 .link-card-desc{font-size:0.8rem;color:var(--text-dim)}
 footer{text-align:center;padding:32px 24px;font-size:0.75rem;color:var(--text-dim);border-top:1px solid var(--border);margin-top:32px}
 footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--text)}
-.mermaid svg{max-width:100%;height:auto}
+.mermaid svg{width:100%;height:auto}
 @media(max-width:640px){.timeline{grid-template-columns:1fr}.timeline::before{display:none}.benchmark-grid{grid-template-columns:1fr}.workflow-card{grid-template-columns:1fr}.links-grid{grid-template-columns:1fr}nav .nav-links{gap:16px}nav .nav-links a{font-size:0.75rem}}
 </style>
 </head>
@@ -119,7 +121,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--t
 <footer>Built by <a href="https://github.com/mj-deving">@mj-deving</a></footer>
 <script type="module">
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-mermaid.initialize({startOnLoad:true,theme:'dark',themeVariables:{darkMode:true,background:'#161b22',primaryColor:'#1c2333',primaryTextColor:'#e6edf3',primaryBorderColor:'rgba(255,255,255,0.12)',lineColor:'#22d3ee',secondaryColor:'#1c2333',tertiaryColor:'#161b22',fontFamily:'Geist,system-ui,sans-serif',fontSize:'13px',nodeBorder:'rgba(34,211,238,0.3)',mainBkg:'#1c2333',nodeTextColor:'#e6edf3',edgeLabelBackground:'#161b22'}});
+mermaid.initialize({startOnLoad:true,theme:'base',themeVariables:{darkMode:true,background:'#1c2333',primaryColor:'#1c2333',primaryTextColor:'#e6edf3',primaryBorderColor:'rgba(34,211,238,0.4)',lineColor:'#22d3ee',secondaryColor:'#1c2333',tertiaryColor:'#161b22',fontFamily:'Geist,system-ui,sans-serif',fontSize:'15px',nodeBorder:'rgba(34,211,238,0.4)',mainBkg:'#1c2333',nodeTextColor:'#e6edf3',edgeLabelBackground:'#161b22',nodePadding:12}});
 </script>
 </body>
 </html>
