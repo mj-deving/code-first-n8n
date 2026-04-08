@@ -391,7 +391,7 @@
       "parameters": {
         "resource": "message",
         "operation": "sendMessage",
-        "chatId": "443039215",
+        "chatId": "YOUR_CHAT_ID",
         "text": "={{ \"DRINGEND [\" + $json.kategorie.toUpperCase() + \"]\\n\" + $json.user + \" | \" + $json.channel + \"\\nDringlichkeit: \" + $json.dringlichkeit + \"/10 | Qualitaet: \" + $json.qualitaetsScore + \"/10\\n\\n\" + ($json.antwort || \"\").split(\"*\").join(\"\").split(\"`\").join(\"\").split(\"_\").join(\"\").substring(0, 200) }}",
         "additionalFields": {}
       },
@@ -629,7 +629,7 @@
         "updatedAt": "2026-03-11T07:37:14.647Z",
         "createdAt": "2026-03-11T07:16:46.408Z",
         "id": "aCXUToL316T52fqN",
-        "name": "Marius  J <mariusclaude@proton.me>",
+        "name": "Marius  J <email@example.com>",
         "type": "personal",
         "icon": null,
         "description": null,
@@ -1032,7 +1032,7 @@
         "parameters": {
           "resource": "message",
           "operation": "sendMessage",
-          "chatId": "443039215",
+          "chatId": "YOUR_CHAT_ID",
           "text": "={{ \"DRINGEND [\" + $json.kategorie.toUpperCase() + \"]\\n\" + $json.user + \" | \" + $json.channel + \"\\nDringlichkeit: \" + $json.dringlichkeit + \"/10 | Qualitaet: \" + $json.qualitaetsScore + \"/10\\n\\n\" + ($json.antwort || \"\").split(\"*\").join(\"\").split(\"`\").join(\"\").split(\"_\").join(\"\").substring(0, 200) }}",
           "additionalFields": {}
         },
