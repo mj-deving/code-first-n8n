@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Token Savings Calculator — Code-Mode for n8n</title>
+<meta name="description" content="Calculate how much you save with code-mode. Real benchmark: 96% token savings by collapsing N sequential LLM calls into 1 sandboxed execution.">
+<meta property="og:title" content="Token Savings Calculator — Code-Mode">
+<meta property="og:description" content="Estimate your AI agent token savings. Real benchmark: 96% reduction.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://github.com/mj-deving/code-mode">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --font-body: 'Geist', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'SF Mono', Consolas, monospace;
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface-elevated: #1c2333;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-bright: rgba(255, 255, 255, 0.12);
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --accent: #22d3ee;
+  --accent-dim: rgba(34, 211, 238, 0.12);
+  --green: #34d399;
+  --green-dim: rgba(52, 211, 153, 0.12);
+  --red: #f87171;
+  --red-dim: rgba(248, 113, 113, 0.08);
+  --amber: #fbbf24;
+  --radius: 10px;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  background-image: radial-gradient(ellipse at 50% 0%, var(--accent-dim) 0%, transparent 50%);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+/* --- Header --- */
+header { padding: 56px 24px 32px; text-align: center; }
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--accent);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  border-radius: 100px;
+  padding: 4px 14px;
+  margin-bottom: 20px;
+  letter-spacing: 0.03em;
+}
+header h1 {
+  font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+header h1 span { color: var(--accent); }
+header p { font-size: 1rem; color: var(--text-dim); max-width: 560px; margin: 0 auto; }
+
+/* --- Hero savings --- */
+.hero-savings {
+  text-align: center;
+  padding: 40px 24px;
+  margin-bottom: 32px;
+}
+.savings-pct {
+  font-family: var(--font-mono);
+  font-size: clamp(3.5rem, 10vw, 6rem);
+  font-weight: 700;
+  color: var(--green);
+  line-height: 1;
+  transition: all 0.3s ease;
+}
+.savings-label {
+  font-size: 1rem;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+.savings-annual {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--amber);
+  margin-top: 16px;
+}
+
+/* --- Grid --- */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+@media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+/* --- Cards --- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.card-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-label .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot-accent { background: var(--accent); }
+.dot-green { background: var(--green); }
+.dot-red { background: var(--red); }
+.dot-amber { background: var(--amber); }
+
+/* --- Inputs --- */
+.field { margin-bottom: 20px; }
+.field label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.field .val {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-bright);
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  cursor: pointer;
+}
+select, .price-input {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background: var(--surface-elevated);
+  color: var(--text);
+  border: 1px solid var(--border-bright);
+  border-radius: 6px;
+  padding: 8px 12px;
+  width: 100%;
+  outline: none;
+}
+select:focus, .price-input:focus { border-color: var(--accent); }
+.price-row { display: flex; gap: 12px; }
+.price-row > div { flex: 1; }
+.price-row label { font-size: 0.75rem; color: var(--text-dim); display: block; margin-bottom: 4px; }
+
+/* --- Comparison cards --- */
+.compare-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.compare-card.bad { border-color: var(--red-dim); }
+.compare-card.good { border-color: var(--green-dim); }
+.stat { margin-bottom: 14px; }
+.stat-label { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 2px; }
+.stat-value { font-family: var(--font-mono); font-size: 1.1rem; font-weight: 600; }
+
+/* --- Bar chart --- */
+.bar-wrap { margin-bottom: 32px; }
+.bar-pair { margin-bottom: 16px; }
+.bar-title { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 4px; }
+.bar-track { height: 28px; background: var(--surface); border-radius: 6px; position: relative; overflow: hidden; }
+.bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.4s ease;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--bg);
+  white-space: nowrap;
+}
+.bar-fill.trad { background: var(--red); }
+.bar-fill.cm { background: var(--green); }
+
+/* --- Cost grid --- */
+.cost-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 40px; }
+@media (max-width: 640px) { .cost-grid { grid-template-columns: 1fr; } }
+.cost-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+}
+.cost-card .period { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.cost-card .amount { font-family: var(--font-mono); font-size: 1.3rem; font-weight: 700; color: var(--green); }
+
+/* --- Callout --- */
+.callout {
+  background: var(--accent-dim);
+  border: 1px solid rgba(34, 211, 238, 0.15);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 32px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.callout strong { color: var(--accent); }
+.callout a { color: var(--accent); text-decoration: underline; }
+
+/* --- CTA --- */
+.cta-wrap { text-align: center; margin-bottom: 48px; }
+.cta {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  padding: 14px 32px;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.cta:hover { opacity: 0.85; }
+
+/* --- Footer --- */
+footer {
+  text-align: center;
+  padding: 24px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+}
+footer a { color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="tag">code-mode for n8n</div>
+  <h1>Token Savings <span>Calculator</span></h1>
+  <p>See how much you save by collapsing sequential LLM tool calls into one sandboxed code execution.</p>
+</header>
+
+<div class="container">
+
+  <!-- Hero savings -->
+  <div class="hero-savings">
+    <div class="savings-pct" id="heroPct">96%</div>
+    <div class="savings-label">estimated token savings</div>
+    <div class="savings-annual" id="heroAnnual">saving $15,786/year</div>
+  </div>
+
+  <!-- Inputs + Compare -->
+  <div class="grid-2">
+
+    <!-- Input card -->
+    <div class="card">
+      <div class="card-label"><span class="dot dot-accent"></span> Your Workflow</div>
+
+      <div class="field">
+        <label>Tool calls per execution <span class="val" id="vCalls">5</span></label>
+        <input type="range" id="sCalls" min="1" max="20" value="5">
+      </div>
+      <div class="field">
+        <label>Avg tokens per LLM call <span class="val" id="vTokens">1,500</span></label>
+        <input type="range" id="sTokens" min="100" max="5000" step="100" value="1500">
+      </div>
+      <div class="field">
+        <label>Executions per day <span class="val" id="vExecs">100</span></label>
+        <input type="range" id="sExecs" min="1" max="10000" step="1" value="100">
+      </div>
+      <div class="field">
+        <label>LLM Model</label>
+        <select id="selModel">
+          <option value="2.5|10">GPT-4o ($2.50 / $10)</option>
+          <option value="3|15">Claude Sonnet ($3 / $15)</option>
+          <option value="0.8|4" selected>Claude Haiku ($0.80 / $4)</option>
+          <option value="0.075|0.30">Gemini Flash ($0.075 / $0.30)</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <div class="price-row">
+        <div>
+          <label for="pIn">$/1M input tokens</label>
+          <input type="number" class="price-input" id="pIn" value="0.80" step="0.01" min="0">
+        </div>
+        <div>
+          <label for="pOut">$/1M output tokens</label>
+          <input type="number" class="price-input" id="pOut" value="4" step="0.01" min="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="compare-card bad">
+        <div class="card-label"><span class="dot dot-red"></span> Traditional</div>
+        <div class="stat"><div class="stat-label">LLM calls / execution</div><div class="stat-value" id="tradCalls">5</div></div>
+        <div class="stat"><div class="stat-label">Input tokens / execution</div><div class="stat-value" id="tradTokens">22,500</div></div>
+        <div class="stat"><div class="stat-label">Daily cost</div><div class="stat-value" id="tradCost">$5.63</div></div>
+      </div>
+      <div class="compare-card good">
+        <div class="card-label"><span class="dot dot-green"></span> Code-Mode</div>
+        <div class="stat"><div class="stat-label">LLM calls / execution</div><div class="stat-value">1</div></div>
+        <div class="stat"><div class="stat-label">Input tokens / execution</div><div class="stat-value" id="cmTokens">1,500</div></div>
+        <div class="stat"><div class="stat-label">Daily cost</div><div class="stat-value" id="cmCost">$0.24</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bar chart -->
+  <div class="bar-wrap">
+    <div class="card-label"><span class="dot dot-amber"></span> Daily Token Consumption</div>
+    <div class="bar-pair">
+      <div class="bar-title">Traditional</div>
+      <div class="bar-track"><div class="bar-fill trad" id="barTrad" style="width:100%">2,250,000</div></div>
+    </div>
+    <div class="bar-pair">
+      <div class="bar-title">Code-Mode</div>
+      <div class="bar-track"><div class="bar-fill cm" id="barCm" style="width:7%">150,000</div></div>
+    </div>
+  </div>
+
+  <!-- Cost savings -->
+  <div class="card-label" style="margin-bottom:12px"><span class="dot dot-green"></span> You Save</div>
+  <div class="cost-grid">
+    <div class="cost-card"><div class="period">Daily</div><div class="amount" id="saveDay">$5.39</div></div>
+    <div class="cost-card"><div class="period">Monthly</div><div class="amount" id="saveMo">$161.70</div></div>
+    <div class="cost-card"><div class="period">Annually</div><div class="amount" id="saveYr">$1,967.35</div></div>
+  </div>
+
+  <!-- Callout -->
+  <div class="callout">
+    <strong>Real benchmark:</strong> 96% token savings on a 5-tool customer onboarding pipeline. 11 LLM calls collapsed to 1.
+    <a href="https://github.com/mj-deving/code-mode/tree/main/workflows/01-customer-onboarding/benchmark.md">See proof</a>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-wrap">
+    <a href="https://github.com/mj-deving/code-mode" class="cta">Get Started on GitHub</a>
+  </div>
+
+</div>
+
+<footer>
+  Built with data from the <a href="https://github.com/mj-deving/code-mode">Code-First n8n Proving Ground</a>
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = n => n.toLocaleString('en-US');
+const fmtUsd = n => n < 0.01 ? '<$0.01' : '$' + n.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+const sCalls = $('sCalls'), sTokens = $('sTokens'), sExecs = $('sExecs');
+const selModel = $('selModel'), pIn = $('pIn'), pOut = $('pOut');
+
+selModel.addEventListener('change', () => {
+  if (selModel.value === 'custom') return;
+  const [i, o] = selModel.value.split('|');
+  pIn.value = i; pOut.value = o;
+  calc();
+});
+
+function calc() {
+  const calls = +sCalls.value;
+  const baseTokens = +sTokens.value;
+  const execs = +sExecs.value;
+  const priceIn = +pIn.value;
+  const priceOut = +pOut.value;
+
+  // Display slider values
+  $('vCalls').textContent = calls;
+  $('vTokens').textContent = fmt(baseTokens);
+  $('vExecs').textContent = fmt(execs);
+
+  // Traditional: quadratic context accumulation
+  // Each call i carries context from all previous calls
+  let tradInputTotal = 0;
+  for (let i = 1; i <= calls; i++) tradInputTotal += baseTokens * i;
+  const tradOutputTotal = 200 * calls;
+  const tradCostPer = (tradInputTotal * priceIn + tradOutputTotal * priceOut) / 1e6;
+  const tradDaily = tradCostPer * execs;
+
+  // Code-mode: 1 call, constant tokens
+  const cmInput = baseTokens;
+  const cmOutput = 300;
+  const cmCostPer = (cmInput * priceIn + cmOutput * priceOut) / 1e6;
+  const cmDaily = cmCostPer * execs;
+
+  // Savings
+  const tokenSavings = tradInputTotal > 0 ? Math.round((1 - cmInput / tradInputTotal) * 100) : 0;
+  const dailySave = tradDaily - cmDaily;
+  const monthlySave = dailySave * 30;
+  const annualSave = dailySave * 365;
+
+  // Hero
+  $('heroPct').textContent = tokenSavings + '%';
+  $('heroAnnual').textContent = 'saving ' + fmtUsd(annualSave) + '/year';
+
+  // Compare cards
+  $('tradCalls').textContent = calls;
+  $('tradTokens').textContent = fmt(tradInputTotal);
+  $('tradCost').textContent = fmtUsd(tradDaily);
+  $('cmTokens').textContent = fmt(cmInput);
+  $('cmCost').textContent = fmtUsd(cmDaily);
+
+  // Bars
+  const tradDailyTokens = tradInputTotal * execs;
+  const cmDailyTokens = cmInput * execs;
+  const maxTokens = tradDailyTokens;
+  $('barTrad').style.width = '100%';
+  $('barTrad').textContent = fmt(tradDailyTokens);
+  const cmPct = maxTokens > 0 ? Math.max(3, (cmDailyTokens / maxTokens) * 100) : 3;
+  $('barCm').style.width = cmPct + '%';
+  $('barCm').textContent = fmt(cmDailyTokens);
+
+  // Cost savings
+  $('saveDay').textContent = fmtUsd(dailySave);
+  $('saveMo').textContent = fmtUsd(monthlySave);
+  $('saveYr').textContent = fmtUsd(annualSave);
+}
+
+[sCalls, sTokens, sExecs].forEach(s => s.addEventListener('input', calc));
+[pIn, pOut].forEach(p => p.addEventListener('input', calc));
+calc();
+</script>
+</body>
+</html>
