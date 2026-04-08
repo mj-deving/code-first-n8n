@@ -7,6 +7,23 @@ This repo proves that two tools together cover the entire n8n workflow lifecycle
 - **[n8nac](https://github.com/mj-deving/n8n-autopilot)** — code-first *development* (write, deploy, test, debug from terminal)
 - **[code-mode](https://github.com/universal-tool-calling-protocol/code-mode)** — code-first *runtime* (collapse N LLM calls → 1 sandboxed execution)
 
+## Evolution
+
+This project didn't start here. It evolved through three phases:
+
+```
+n8n-autopilot (2025)          n8nac matures (2026-Q1)       code-mode integration (2026-Q1/Q2)
+─────────────────────    →    ─────────────────────    →    ──────────────────────────────
+Built workflows in n8n        Built the tool that            Built the runtime that
+manually. Felt the pain       writes workflows from          executes them in one shot.
+of click-driven dev.          TypeScript. Dev-time solved.   Runtime solved.
+German UI, 16-node WFs,       n8nac push/pull/verify,        isolated-vm sandbox,
+check-secrets.sh born here.   .workflow.ts format,           96% token savings,
+                              code-as-config thesis forms.   full lifecycle proven.
+```
+
+**[n8n-autopilot](https://github.com/mj-deving/n8n-autopilot)** proved the pain — complex workflows are unmaintainable in a visual UI. **n8nac** solved dev-time by making workflows code-first. **code-mode** solved runtime by collapsing N tool calls into one sandboxed execution. This proving ground brings both together and measures the results.
+
 ## The Lifecycle
 
 | Layer | Tool | Status |
@@ -37,7 +54,7 @@ Each POC proves one layer of the thesis with real data:
 |---|---|---|
 | [01 — Customer Onboarding](workflows/01-customer-onboarding/) | Runtime: 96% token savings | Benchmarked |
 | [02 — MCP Filesystem](workflows/02-mcp-filesystem/) | Real file operations through MCP in sandbox | Verified |
-| [03 — Multi-Agent Dispatch](workflows/03-multi-agent-dispatch/) | 16-node workflow → 1 code block | Analyzed |
+| [03 — Multi-Agent Dispatch](workflows/03-multi-agent-dispatch/) | 16-node workflow → 3 nodes (81% reduction) | Implemented |
 | [04 — Dev Loop](workflows/agents/04-dev-loop/) | Full lifecycle: n8nac → code-mode end-to-end | **E2E Proven** |
 | [05 — E2E Sibling Tools](workflows/05-e2e-sibling-tools/) | Zero-config tool discovery + execution | **8/8 pass** |
 
@@ -151,7 +168,7 @@ Built on top of [@utcp/code-mode](https://www.npmjs.com/package/@utcp/code-mode)
 
 This scaffolds a complete workflow directory from [template/](template/) with README, workflow.ts skeleton, test.json stub, and all sections pre-filled. See [TEMPLATE.md](TEMPLATE.md) for the hybrid approach.
 
-**Workflow lifecycle:** Develop in this monorepo → prove with benchmarks → graduate to standalone repo for distribution.
+**Workflow lifecycle:** Develop in this monorepo → prove with benchmarks → distribute via n8n community templates and blog posts.
 
 ## Deep Dives
 
