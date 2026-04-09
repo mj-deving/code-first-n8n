@@ -166,6 +166,7 @@ Use the [n8n-project-template](https://github.com/mj-deving/n8n-project-template
 | [Playbook: Lifecycle](playbook/lifecycle.md) | Portable framing of the code-first n8n story |
 | [Playbook: Benchmarks](playbook/benchmarks.md) | Token savings data, methodology, cost projections |
 | [Playbook: Architecture](playbook/architecture.md) | How @code-mode/core, n8n node, and MCP server fit together |
+
 ## Related Repos
 
 | Repo | What |
