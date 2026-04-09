@@ -3,6 +3,9 @@ n8n-nodes-utcp-codemode/
 n8n-autopilot/
 repo/
 
+# Separate npm packages (own repos)
+code-mode-mcp-server/
+
 # Build artifacts
 node_modules/
 dist/
@@ -22,6 +25,15 @@ Plans/
 
 # n8nac runtime config (has instance-specific paths)
 n8nac-config.json
+
+# Internal dev tooling (moved to n8n-project-template)
+archive/
+template/
+scripts/
+.githooks/
+
+# n8nac export artifacts
+workflows/_export/
 
 # Stray artifacts
 null/

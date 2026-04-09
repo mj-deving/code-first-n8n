@@ -66,16 +66,8 @@ Each POC proves one layer of the thesis with real data:
 | Directory | What |
 |---|---|
 | `workflows/` | POC workflow directories (the proving ground) |
-| `n8n-nodes-utcp-codemode/` | npm monorepo: `@code-mode/core` SDK + n8n community node |
-| `code-mode-mcp-server/` | Standalone MCP server wrapping CodeModeEngine (separate npm package) |
-| `repo/` | Cloned upstream [UTCP code-mode](https://github.com/universal-tool-calling-protocol/code-mode) library (read-only reference) |
-| `n8n-autopilot/` | Cloned [n8nac](https://github.com/mj-deving/n8n-autopilot) (read-only reference) |
 | `playbook/` | Portable knowledge: lifecycle framing, benchmarks, architecture |
-| `docs/` | ADRs and design documents |
-| `template/` | Scaffold source for new workflow directories |
-| `scripts/` | Tooling (new-workflow, check-secrets) |
-| `archive/` | Original research artifacts from exploration phase |
-| `null/` | Empty placeholder (artifact from early scaffolding) |
+| `docs/` | ADRs, design documents, and GitHub Pages |
 
 ## Install
 
@@ -163,41 +155,24 @@ return { result: sum }; // { sum: 300 }
 
 Built on top of [@utcp/code-mode](https://www.npmjs.com/package/@utcp/code-mode) (upstream library by [UTCP](https://github.com/universal-tool-calling-protocol/code-mode)).
 
-## Create a New Workflow
+## Start Your Own Project
 
-```bash
-./scripts/new-workflow.sh agents/06-slack-triage "Slack Message Triage"
-```
-
-This scaffolds a complete workflow directory from [template/](template/) with README, workflow.ts skeleton, test.json stub, and all sections pre-filled. See [docs/TEMPLATE.md](docs/TEMPLATE.md) for the workflow template requirements.
-
-**Workflow lifecycle:** Develop in this monorepo → prove with benchmarks → distribute via n8n community templates and blog posts.
+Use the [n8n-project-template](https://github.com/mj-deving/n8n-project-template) to scaffold new code-first n8n projects with all the patterns from this proving ground built in.
 
 ## Deep Dives
 
 | Document | What's Inside |
 |---|---|
-| [docs/TEMPLATE.md](docs/TEMPLATE.md) | Workflow template requirements and lifecycle |
 | [Playbook: Lifecycle](playbook/lifecycle.md) | Portable framing of the code-first n8n story |
 | [Playbook: Benchmarks](playbook/benchmarks.md) | Token savings data, methodology, cost projections |
 | [Playbook: Architecture](playbook/architecture.md) | How @code-mode/core, n8n node, and MCP server fit together |
-## Contributing
+## Related Repos
 
-```bash
-# Build n8n community node (monorepo)
-cd n8n-nodes-utcp-codemode && npm run build && npm test
-
-# Scaffold a new workflow
-./scripts/new-workflow.sh agents/06-slack-triage "Slack Message Triage"
-
-# Check for secrets before committing
-npm run check-secrets
-
-# Check n8n execution results
-npm run check-exec -- <workflowId>
-```
-
-AI agents: see [AGENTS.md](AGENTS.md) for the n8nac workflow protocol.
+| Repo | What |
+|---|---|
+| [n8n-project-template](https://github.com/mj-deving/n8n-project-template) | Clone to start your own code-first n8n project |
+| [n8n-autopilot](https://github.com/mj-deving/n8n-autopilot) | n8nac CLI for code-first workflow development |
+| [code-mode](https://github.com/universal-tool-calling-protocol/code-mode) | Upstream code-mode runtime |
 
 ## LLM Compatibility
 
