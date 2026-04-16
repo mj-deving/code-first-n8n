@@ -167,13 +167,23 @@ Use the [n8n-project-template](https://github.com/mj-deving/n8n-project-template
 | [Playbook: Benchmarks](playbook/benchmarks.md) | Token savings data, methodology, cost projections |
 | [Playbook: Architecture](playbook/architecture.md) | How @code-mode/core, n8n node, and MCP server fit together |
 
+## Production Projects
+
+Projects built on this proving ground — each applies code-mode to a real-world domain:
+
+| Project | What It Does | Code-Mode Advantage |
+|---|---|---|
+| [RAG Pipeline Factory](https://github.com/mj-deving/rag-pipeline-factory) | Meta-workflow that builds RAG pipelines from natural language chat | Code writing code — generates, deploys, validates, and tests n8n workflows in one execution |
+| [SOC Alert Triage](https://github.com/mj-deving/soc-alert-triage) | Security alert enrichment with parallel threat intel (VirusTotal, AbuseIPDB, Shodan, MITRE) | Promise.allSettled fires 4 API calls simultaneously in the sandbox instead of sequential LLM calls |
+| [Self-Healing Workflows](https://github.com/mj-deving/n8n-self-healing) | AI-powered error diagnosis, automated remediation, and learning loop | Collapsed 5-node diagnosis chain into 1 code node with historical pattern matching |
+
 ## Related Repos
 
 | Repo | What |
 |---|---|
 | [n8n-project-template](https://github.com/mj-deving/n8n-project-template) | Clone to start your own code-first n8n project |
 | [n8n-autopilot](https://github.com/mj-deving/n8n-autopilot) | n8nac CLI for code-first workflow development |
-| [code-mode](https://github.com/universal-tool-calling-protocol/code-mode) | Upstream code-mode runtime |
+| [code-mode](https://github.com/universal-tool-calling-protocol/code-mode) | Upstream code-mode runtime (1.4K stars) |
 
 ## LLM Compatibility
 
