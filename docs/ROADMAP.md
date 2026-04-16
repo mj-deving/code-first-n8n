@@ -193,6 +193,22 @@ Telemetry ingestion → anomaly detection → maintenance history correlation �
 
 ---
 
+## Open: Benchmarking Production Projects
+
+All 3 production projects claim token savings but lack reproducible before/after benchmarks like POC-01. Each needs:
+1. **Traditional version** — how many nodes/LLM calls would this take without code-mode?
+2. **Code-mode version** — measured nodes/calls in current implementation
+3. **Token measurement** — actual token counts from n8n execution data
+4. **Upgrade prompts** — see `docs/SESSION-BENCHMARK-*.md` in each project repo
+
+| Project | Claimed Savings | Measured? | Benchmark Prompt |
+|---|---|---|---|
+| RAG Pipeline Factory | "15-25 calls → 1" | No | `rag-pipeline-factory/docs/SESSION-BENCHMARK.md` |
+| SOC Alert Triage | "95%+ savings" | No | `soc-alert-triage/docs/SESSION-BENCHMARK.md` |
+| Self-Healing v2 | "5 nodes → 1" | No | `n8n-self-healing/docs/SESSION-BENCHMARK.md` |
+
+---
+
 ## Code-Mode Optimization Patterns (from n8n-skills analysis)
 
 | Pattern | Current n8n Nodes | Code-Mode | Simplification |
